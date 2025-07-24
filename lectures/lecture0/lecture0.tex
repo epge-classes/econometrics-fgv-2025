@@ -1,0 +1,90 @@
+% Customized by Raul Riva for the Econometrics course at FGV EPGE in 2025
+\documentclass[aspectratio=169, xcolor=dvipsnames, 11pt]{beamer}
+\usetheme{moloch}
+\molochset{
+  progressbar = frametitle,
+  block = fill
+}
+% Use beamer's page number in head/foot template
+\setbeamertemplate{footline}[frame number]
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+% from https://tex.stackexchange.com/a/441705/36296
+\makeatletter
+\addtobeamertemplate{date}{\centering}{}
+\addtobeamertemplate{institute}{\centering}{}
+\patchcmd{\beamer@@tmpl@title}{\raggedright}{\centering}{}{}
+\patchcmd{\beamer@@tmpl@author}{\raggedright}{\centering}{}{}
+\setlength{\moloch@titleseparator@linewidth}{2pt}
+\setlength{\moloch@progressinheadfoot@linewidth}{1pt}
+\makeatother
+
+% Packages
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{xcolor} % For colored bullets
+\usepackage{appendixnumberbeamer}
+
+\title[]{Title Placeholder}
+\author{\textbf{Author Placeholder}}
+\institute{\scriptsize Institute Placeholder}
+\date{Date Placeholder}
+
+% ----- Custom commands -----
+\newtheorem{prop}[theorem]{Proposition}
+
+% ----- Defining colors -----
+\usepackage[dvipsnames]{xcolor}
+\definecolor{slateblue}{RGB}{45, 62, 80}
+\definecolor{FGVBlue}{RGB}{0, 114, 188}
+\setbeamercolor{palette primary}{bg=slateblue, fg=white}
+\setbeamercolor{title separator}{bg=FGVBlue, fg=FGVBlue}
+%\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{progress bar}{fg=FGVBlue,bg=white}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=FGVBlue,
+    urlcolor=FGVBlue,
+    citecolor=FGVBlue
+    }
+    
+% ----- Bibliography -----
+%\usepackage[backend=biber,style=authoryear]{biblatex}
+%\addbibresource{}
+% \DeclareFieldFormat{labelyear}{#1}
+% \DeclareFieldFormat{shorthand}{#1}
+% \DeclareFieldFormat{extraalpha}{#1}
+% \DeclareNameFormat{default}{\namepartfamily}
+% \AtEveryCitekey{\color{FGVBlue}}
+
+%---------------- Document Start ----------------%
+\begin{document}
+
+%---------------- Title Slide ----------------%
+% Title page without margin changes
+\begin{frame}[plain] % Use plain to avoid navigation symbols
+  \titlepage
+\end{frame}
+
+%---------------- Intro ----------------%
+\begin{frame}{Intro}
+  \begin{itemize}
+    \item bla bla bla
+    \item bla bla bla
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Content}
+    
+\end{frame}
+
+\begin{frame}[standout]
+Questions?
+\end{frame}
+
+\end{document}
