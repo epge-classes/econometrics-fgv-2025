@@ -25,10 +25,10 @@ A very tentative schedule below:
 | Week | Tentative Schedule                |
 |------|--------------------------------------------|
 |Week 1    | Non-parametric estimation + (i.i.d.) Bootstrap|
-|Week 2    |abc|
-|Week 3    |abc|
-|Week 4    |abc|
-|Week 5    |abc|
+|Week 2    |Intro to time dependence + ARMA models|
+|Week 3    |Estimation of ARMA models + LGN and CLTs for dependent data|
+|Week 4    |The basics of VARs and IRFs|
+|Week 5    |GMM and HAC estimation|
 
 ## Books? Slides?
 
