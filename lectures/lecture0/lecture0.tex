@@ -1,5 +1,5 @@
 % Customized by Raul Riva for the Econometrics course at FGV EPGE in 2025
-\documentclass[aspectratio=169, xcolor=dvipsnames, 11pt]{beamer}
+\documentclass[aspectratio=169, xcolor=dvipsnames, 12pt]{beamer}
 \usetheme{moloch}
 \molochset{
   progressbar = frametitle,
@@ -27,9 +27,9 @@
 \usepackage{xcolor} % For colored bullets
 \usepackage{appendixnumberbeamer}
 
-\title[]{Title Placeholder}
-\author{\textbf{Author Placeholder}}
-\institute{\scriptsize Institute Placeholder}
+\title[]{Lecture 0: Class Setup}
+\author{\textbf{Raul Riva}}
+\institute{\scriptsize \textcolor{FGVBlue}{FGV EPGE}}
 \date{Date Placeholder}
 
 % ----- Custom commands -----
@@ -64,27 +64,145 @@
 
 %---------------- Document Start ----------------%
 \begin{document}
-
 %---------------- Title Slide ----------------%
-% Title page without margin changes
-\begin{frame}[plain] % Use plain to avoid navigation symbols
+\begin{frame}[plain]
   \titlepage
 \end{frame}
 
-%---------------- Intro ----------------%
-\begin{frame}{Intro}
+%---------------- Instructor Info ----------------%
+\begin{frame}{Course Information}
   \begin{itemize}
-    \item bla bla bla
-    \item bla bla bla
+    \item \textbf{Course}: Econometrics I (Part I);
+    \item \textbf{Instructor}: Raul Guarini Riva — \texttt{raul.riva@fgv.br};
+    \item \textbf{Teaching Assistant}: Taric Latif — \texttt{tariclatif@gmail.com};
+    \item \textbf{Class Schedule}: Tuesdays and Thursdays, 9:00–11:00;
+    \item \textbf{TA Session Schedule}: check with Taric;
+    \item GitHub repository: \url{https://github.com/rgriva/econometrics-fgv-2025}
+    \item After class, you should review the online syllabus in detail;
+  \end{itemize}
+  \vspace{1em}
+  \centering
+  \alert{We will use Github for course materials, assignments, and so on.}
+\end{frame}
+
+%---------------- Motivation ----------------%
+\begin{frame}{Why Should You Take This Class Seriously?}
+  \begin{itemize}
+    \item Most students will engage in empirical research across diverse fields of Economics:
+      \begin{itemize}
+        \item Labor, Development, Urban, Finance, Health, IO, even Macro...!
+        \item Obviously important if you want to do Econometrics;
+      \end{itemize}
+    \item So far, most of what you learned is about \textbf{cross-sectional data} and \textbf{OLS};
+    \item We go beyond cross-sectional data to tackle: \textbf{Time Series} and \textbf{Panel Data};
+    \item Time Series data is your bread and butter in Macro, Finance, and many other fields;
+    \item Panel Data methods (fixed effects, diff-in-diff, ...) are everywhere in empirical research;
+    \item We will also cover a bit of non-parametric methods and bootstrap techniques;
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Content}
-    
+%---------------- Learning Goals ----------------%
+\begin{frame}{Learning Goals (by Week 5)}
+  After the first half of the course, you should be able to:
+
+  \begin{enumerate}\itemsep1em
+    \item Understand and implement non-parametric kernel-based methods;
+    \item Apply bootstrap methods for i.i.d. data;
+    \item Analyze time series data:
+      \begin{itemize}
+        \item Concepts: stationarity, ergodicity, ersistence, autocorrelation, ...
+        \item Basics of ARMA models and VARs;
+        \item Impulse response functions;
+      \end{itemize}
+    \item Implement GMM estimation under heteroskedasticity and autocorrelation;
+    \begin{itemize}
+      \item Super relevant for Panel Data methods;
+      \item Also very useful to estimate structural models;
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Books? Slides?}
+  \begin{itemize}\itemsep1em
+    \item I will provide slides for the lectures;
+    \item These slides will be mostly based on two books:
+      \begin{itemize}
+        \item \textbf{Econometrics}, by Bruce Hansen (hello, old friend!);
+        \item \textbf{Time Series Analysis}, by James Hamilton (serious dark magic);
+      \end{itemize}
+    \item I will highlight the recommended readings in the slides, and reading the books is \textbf{mandatory}.
+    \item Slides are not a substitute for reading the books;
+    \item I will make slides available on Github just before class;
+  \end{itemize}
+\end{frame}
+
+%---------------- Topics Overview ----------------%
+\begin{frame}{\underline{Tentative} Weekly Topics}
+  \begin{itemize}
+    \item \textbf{Week 1:} Non-parametric estimation + Bootstrap for i.i.d. data
+    \item \textbf{Week 2:}
+    \begin{itemize}
+      \item The structure of time series data, stationarity, ergodicity, persistence, autocorrelation, ...;
+      \item ARMA models + the Box-Jenkins methodology + Wold Decomposition;
+    \end{itemize}
+    \item \textbf{Week 3:} 
+    \begin{itemize}
+      \item Estimation of ARMA models, MLE estimators...
+      \item LGN's and CLT's for dependent data -- focus on using the results rather than proving every single little thing;
+    \end{itemize}
+    \item \textbf{Week 4:} 
+    \begin{itemize}
+      \item VAR's, companion form, reduced-form vs structural VARs;
+      \item Impulse response functions and local projections;
+    \end{itemize}
+    \item \textbf{Week 5:} GMM
+    \begin{itemize}
+      \item GMM definition and asymptotic theory;
+      \item GMM and HAC estimation + numerical pitfalls;
+  \end{itemize}
+  \end{itemize}
+  \vspace{1em}
+  \textit{Note: Schedule is still under construction.}
+\end{frame}
+
+\begin{frame}{Evaluation and Grades}
+  \begin{itemize}
+    \item Grades for the first and second half of the class are independent;
+    \item Final grade = 0.5 $\times$ (Grade on Part I) + 0.5 $\times$ (Grade on Part II);
+    \item The first part has 2 problem sets and 1 exam:
+    \begin{equation}
+      \text{Grade on Part I} = \frac{1}{6} \times \text{PS1} + \frac{1}{6} \times \text{PS2} + \frac{2}{3} \times \text{Exam}
+    \end{equation}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Sets}
+\begin{itemize}
+  \item You can work in groups of up to 3 students;
+  \item There will be both theoretical and empirical questions;
+  \item Problem set solutions must be submitted in PDF format through Github;
+  \item Create a folder for you group under \texttt{student\_work/name1\_name2\_name3/}. Please upload your work there;
+  \item You should deliver both a report answering the questions and the code used to generate the results;
+  \item Feel free to use any civilized programming language (Python, R, Julia, Matlab, ...);
+  \item No, you cannot use Stata or pre-packaged solutions in any of the languages above -- details will be provided in the problem sets;
+\end{itemize}
 \end{frame}
 
 \begin{frame}[standout]
 Questions?
+\end{frame}
+
+\begin{frame}{One more thing...}
+  \begin{center}
+    \alert{\textbf{This is really important!}}
+  \end{center}
+  \begin{itemize}
+    \item This is the first time I teach this class;
+    \item I need ongoing feedback;
+    \item Is there something great about? Tell me! If there something terrible about it? Also tell me!
+    \item Don't be shy -- negative feedback will never be punished in any way;
+    \item If anything, on the contrary!
+  \end{itemize}
 \end{frame}
 
 \end{document}
