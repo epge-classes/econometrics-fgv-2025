@@ -2,6 +2,8 @@
 .DS_Store
 */.DS_Store
 
+## Specific for this project:
+beamer_template.pdf
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
