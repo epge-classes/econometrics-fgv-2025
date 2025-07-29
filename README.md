@@ -3,7 +3,7 @@ This is the repository for the first half of Econometrics I, taught by [Raul Riv
 
 * Instructor: Raul Guarini Riva (raul.riva at fgv.br)
 * TA: Taric Latif (tariclatif at gmail.com)
-* Classes: Tuesdays and Thursdays, 9:00-11:00
+* Classes: Tuesdays and Thursdays, 11:00-13:00
 
 ## Why Should You Take This Class?
 First of all, it's a mandatory class. But let's set that aside...
