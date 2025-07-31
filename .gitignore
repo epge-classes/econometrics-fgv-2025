@@ -5,6 +5,7 @@
 ## Specific for this project:
 beamer_template.pdf
 Econometrics Data/
+lecture*_files/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
