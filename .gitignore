@@ -8,6 +8,7 @@ Econometrics Data/
 lecture*_files/
 Question_Bank.md
 Question_Bank.tex
+*.html
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
