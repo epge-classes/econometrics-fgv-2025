@@ -33,10 +33,9 @@
 \newcounter{problem}
 \renewcommand{\theproblem}{\arabic{problem}}
 
-\newcommand{\problem}{
+\newcommand{\problem}[1]{
 	\stepcounter{problem}
-	\section*{Problem \theproblem}
-	\addcontentsline{toc}{section}{Problem \theproblem}
+	\section*{Problem \theproblem{} -- (points: #1)}
 }
 
 \begin{document}
@@ -48,7 +47,7 @@
 		TA: Taric Latif Padovani
 	\end{center}
 
-\problem
+\problem{1}
 Let $X$ be a scalar random variable with density $f(x)$. Let $K(\cdot)$ be a symmetric second-order kernel. For a given point $x$ in the interior of the support of $f(\cdot)$, define the density estimator as
 \[\hat{f}_n(x) \equiv \frac{1}{nh} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right),\]
 where \(h > 0\) is a bandwidth parameter and \(X_1, \ldots, X_n\) are independent and identically distributed (i.i.d.) random variables with density \(f(\cdot)\).
@@ -69,7 +68,7 @@ This exercise will show you how to ensure that $\hat{f}_n(x) \xrightarrow{p} f(x
 
 Hint: A very useful resource for this question is Chapter 17 from \textit{Probability and Statistics for Economists} by Bruce Hansen.
 
-\problem
+\problem{1}
 Let $X$ be a continuous random variable with density $f(\cdot)$, which is positive everywhere. Suppose the true regression function is linear, \( m(X = x) = \alpha + \beta x \), and we estimate the function using the Nadaraya-Watson estimator. Assume all regularity conditions you need.
 
 \begin{enumerate}[a)]
@@ -79,7 +78,7 @@ Let $X$ be a continuous random variable with density $f(\cdot)$, which is positi
 	\item Can you intuitively explain why the Nadaraya-Watson estimator is positively or negatively biased in these regions?
 \end{enumerate}
 
-\problem
+\problem{3}
 This is an empirical question based on Karlan and Zinman (2008, Econometrica). You will find the paper online on the class Github repo. The data used in the paper is also available there.
 
 \begin{enumerate}[a)]
@@ -98,5 +97,59 @@ This is an empirical question based on Karlan and Zinman (2008, Econometrica). Y
 	\item Do the same with the Epanechnikov kernel, using the same bandwidths as before.
 	\item Compare the results of the two kernels qualitatively.
 \end{enumerate}
+
+\problem{2}
+Let $X_i, i = 1, \dots, n$ be an i.i.d.\ sample of observations with distribution $U[0, \theta]$. A natural estimator (in fact, the MLE) of $\theta$ is $X_{(n)}$, where
+\[
+\min\{X_1, ..., X_n\} =  X_{(1)} \leq \cdots \leq X_{(n)} = \max\{X_1, ..., X_n\}
+\]
+denote the ordered values of the data. These statistics are sometimes referred to as the order statistics of the data. Consider the following root:
+\[
+R_n = n(X_{(n)} - \theta),
+\]
+
+\begin{enumerate}[a)]
+	\item Show that $R_n \leq 0$.
+    \item Let $J_n(x, P) = P(Rn \leq x)$ be the cdf of the root $R_n$ above. Show that $J_n(x, P)$ converges in distribution to $J(x, P) = P(-\theta X \leq x)$, where $X \sim \text{exp}(1)$, i.e.,
+    \[
+    J(x, P) =
+    \begin{cases}
+    e^{x/\theta}, & x \leq 0 \\
+    0 & \text{otherwise}
+    \end{cases}
+    \]
+	Hint: for every $r \in \mathbb{R}$, remember that $\left(1 + \frac{r}{n}\right)^{n} \xrightarrow{n \to \infty} e^r$.
+
+	\item We will now prove that the bootstrap will not work in this case. Consider a non-random sequence of probability distributions $\{P_n\}_{n=1}^{\infty}$ such that each distribution $P_n$ puts equal mass on $n$ distinct points in the interval $[0, \theta]$.
 	
+	For each $n$, let $\left\{X_{i, n}\right\}_{i=1}^{n}$ be an i.i.d. sample from $P_n$. Denote by $X_{(n), n}$ the maximum of this $n$-th sample. Also, denote by $\theta(P_n)$ the maximum of the support of $P_n$.
+	
+	Now, show that $\lim\limits_{n\rightarrow \infty}P\left(n (X_{(n), n}) - \theta(P_n) \leq - \epsilon\right) \leq e^{-1}, \forall \epsilon >0$.
+
+	\item Use this result to show that $J_n(x, P_n)$, which is the distribution of the bootstrapped root under the measure $P_n$ does $not$ converge to $J(x, P)$.
+	
+	Hint: pick $\epsilon < \theta$.
+
+	\item Argue, using the last item ,that the bootstrap does not work in this case. Think about the relationship between the empirical distribution and the sequence of distributions $\{P_n\}_{n=1}^{\infty}$.
+\end{enumerate}
+
+
+\problem{3}
+This question is about the bootstrap. Suppose that $y_i = \alpha + \beta x_i + \epsilon_i$, where $\alpha = 2$, $\beta = 5$, $\epsilon_i|x_i \sim N(0, 2 + x_i^2)$, and $x \sim N(0, 3)$.
+\begin{enumerate}[a)]
+	\item Compute the conditional distribution of $y_i$ given $x_i$;
+	\item Simulate a random sample of size $n = 100$ and create a scatter plot of your data;
+	\item Estimate the parameters using OLS;
+	\item Report the estimates and three different symmetric confidence intervals for $\beta$ using different measures of standard errors:
+	\begin{itemize}
+		\item The usual OLS standard error that ignores heteroskedasticity;
+		\item An heterokedasticity-robust standard error;
+		\item A bootstrap standard error, using $B = 1000$ bootstrap samples
+	You should also plot the histogram of $\hat{\beta}$ computed from the bootstrap samples.
+	\end{itemize}
+
+	It will be helpful for the next item if you structure your code so that it receives a certain sample $\{(y_1, x_1), (y_2, x_2), ..., (y_n, x_n)\}$ and spits out the three different confidence intervals.
+
+	\item Repeat the steps from items b), c), and d) for $m = 500$ times and check how frequently the three different confidence intervals cover the true value of $\beta = 5$. You can use the same code from item b) to do this, but you will need to modify it so that it runs $m$ times and stores the results.
+\end{enumerate}
 \end{document}
