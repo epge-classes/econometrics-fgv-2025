@@ -1,0 +1,458 @@
+---
+title: "Lecture 3: Building Blocks for Time Series"
+author: "Raul Riva"
+institute: "FGV EPGE"
+date: "some date"
+format: 
+    beamer:
+        aspectratio: 169
+        include-in-header: ../beamer_template.tex
+        header-includes:
+            - \apptocmd{\tightlist}{\setlength{\itemsep}{8pt}}{}{}
+        slide-level: 2
+        urlcolor: FGVBlue
+        linkcolor: slateblue
+        fig-align: center
+jupyter: python3
+highlight-style: github
+---
+
+# Intro
+
+Common data structures in Economics:
+
+ - Cross-sectional data: many units, one time period
+    * Example: grades of several students in a given exam, GDP growth of several countries in a given year;
+ - Time series data: one unit, many time periods
+    * Example: inflation over time for a given country, amount on rain in a given area, price of a stock over time;
+ - Panel data: many units, many time periods for the same units
+    * Example: GDP growth of several countries over several years, grades of several students in several exams, prices of several products over time...
+- Text, spatial data, images, etc.
+
+## Intro
+
+- So far: mostly cross-sectional methods (everything about $Y_i$);
+- Next step: time series methods (everything about $Y_t$);
+- Next next step: panel data methods (everything about $Y_{i,t}$) -- probably the most prevalent type nowadays;
+
+. . .
+
+- Next weeks: focus on understanding the challenges of time series data;
+- This lecture: how is a time series different from cross-sectional data? $+$ important definitions;
+- Main reference: [**Time Series Analysis**, by James Hamilton](https://www.amazon.com.br/Time-Analysis-James-Hamilton/dp/0691042896);
+- Hansen's book provides a nice introduction, but it is too short on the topic;
+
+## What is a time series?
+
+- A _time series_ is a sequence of observations on a variable (or several variables) over time on an equally-spaced interval;
+- Example: annual population of a country;
+- Unlike cross-sectional data, time series data is **ordered**;
+- Also assume in this course that time is discrete (i.e., we observe data at specific time intervals, like days, months, years...);
+- Continuous time series (e.g., high-frequency financial data) is a more advanced topic, but with a vast literature as well;
+
+## Why should you care?
+```{=latex}
+\begin{enumerate}
+    \item Policy evaluation: every policy takes place over time;
+        \begin{itemize}
+            \item What's the impact of a reform? Before vs after? Are effects long-lasting? Fast die-outs?
+            \item A very important building block for panel data methods;
+        \end{itemize}
+    \item Forecasting: how can the future look like?
+    \begin{itemize}
+        \item What will the inflation rate be next month? What is the expected number of COVID cases next week? How many students will enroll next semester?
+        \item How much inventory should a firm hold? What's the likely path of deforestation in a given area?
+    \end{itemize}
+    \item Nowcasting: high(er)-frequency monitoring of low-frequency variable;
+    \begin{itemize}
+        \item What is the current state of the economy? How many people are currently unemployed? How many people are currently infected with COVID?
+    \end{itemize}
+    \pause
+    \item It has \alert{very} elegant math behind it!
+\end{enumerate}
+```
+
+## The Role of Dependence
+- In cross-sectional data, we typically assume that observations are i.i.d;
+- If we relabel observations, we have no problems;
+
+. . .
+
+- In time series, independence is a rare exception;
+- Their distribution might also change over time;
+- If we relabel observations, we change the meaning of the data;
+
+. . .
+
+Examples:
+
+- If inflation is high this month, it will likely be high next month;
+- If a student is doing well on every exam, they will likely do well on the next one;
+- The major difference w.r.t. cross-sectional data is that the future might depend on the past;
+
+# Building Blocks
+
+Formally, the right way to think about time series is as a **stochastic process**;
+
+First, we define what a _random variable_ is:
+
+```{=latex}
+\begin{definition}[Random Variable]
+    Given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, a random variable is a real function $Y:\Omega\rightarrow\mathbb{R}$, such that for all $c\in \mathbb{R}$, $A_c=\{\omega\in\Omega|Y(\omega)\leq c\}\in\mathcal{F}$, $\forall\,c\in\mathbb{R}$.
+\end{definition}
+```
+
+- $\Omega$ is a sample space. Example: the numbers on a die (1, 2, 3, 4, 5, 6);
+- $\mathcal{F}$ is a collection of events. Example: even numbers.
+- $\mathbb{P}: \mathcal{F} \to [0,1]$ is a probability measure. Example: probability of rolling an even number;
+
+. . .
+
+- Think about an i.i.d sample as different realizations of $\omega$;
+- $Y_1 = Y(\omega_1), Y_2 = Y(\omega_2), ...$
+
+## Stochastic Processes
+```{=latex}
+\begin{definition}[Stochastic Process]
+A \textit{stochastic process} is an ordered sequence (collection) of random variables $\{Y_t(\omega),\omega\in\Omega,t\in\mathcal{T}\}$, such that for all $t\in\mathcal{T}$, $Y_t(\omega)$ \textbf{is a random variable} in $\Omega$ and $\mathcal{T}$ is an ordering set, for example, $\mathbb{Z} = \{-2, -1, 0, 1, 2, ...\}$.
+\end{definition}
+```
+
+Loosely speaking:
+
+- A **random variable** is way to model an uncertain number;
+- A **stochastic process** is a way to model an uncertain _path_;
+- In reality, we only observe one, and only one, realization of the stochastic process;
+- Think about the history of the world: it is a single realization of $\Omega$;
+- YOLO: you only live once!
+
+## YOLO
+```{python}
+
+import numpy as np
+import matplotlib.pyplot as plt
+# make font be arial
+plt.rcParams['font.family'] = 'Arial'
+
+
+```
+
+```{python}
+# Simulate the path of 100 random walks
+n = 500
+T = 101
+paths = np.zeros((n, T))
+np.random.seed(2141)
+for i in range(n):
+    for t in range(1, T):
+        paths[i, t] = paths[i, t-1] + np.random.normal(0, 1)
+
+plt.figure(figsize=(6, 3))
+strong_blue = '#0057b8'  # Strong blue hex code
+for i in range(n-1):
+    plt.plot(paths[i], alpha=0.1, color=strong_blue, label='What could have happened' if i == 0 else "")
+plt.plot(paths[-1], color='red', linewidth=2, label='What you actually saw')
+plt.title('{} paths of the same stochastic process'.format(n))
+plt.xlabel('Periods')
+plt.tight_layout()
+
+# Custom legend colors
+from matplotlib.lines import Line2D
+custom_lines = [
+    Line2D([0], [0], color=strong_blue, lw=2, label='What could have happened'),
+    Line2D([0], [0], color='red', lw=2, label='What you actually saw')
+]
+plt.legend(handles=custom_lines)
+plt.gca().set_axisbelow(True)
+plt.grid(alpha=0.3)
+```
+
+## The Challenge Ahead
+
+- You only observe the red, but the blue paths were equally likely to have happened;
+- The main challenge is that you see *one* path and you want to make inference about the *whole process*;
+
+. . .
+
+Example: inflation in Brazil in 1989;
+
+ - We know it was super high;
+ - But we have only one reading of inflation for 1989;
+ - When can we say something about the "inflation process" in Brazil given __only one__ observation?
+
+ . . .
+
+ We will need to impose a lot of structure! Without structure, we are lost!
+
+## {.standout}
+Questions?
+
+
+# Stationarity and Ergodicity
+
+## Weak Stationarity
+```{=latex}
+\begin{definition}[Weak Stationarity]
+A stochastic process $\{Y_t\}$ is said to be \emph{weakly stationary} (or \emph{second-order stationary}, or \emph{covariance stationary}) if, and only if, the first two population unconditional moments of $\{Y_t\}$ exists and are constant:
+\begin{equation*}
+\begin{split}
+&\mathbb{E}[Y_t]=\mu,\,\,|\mu|<\infty,\,\,\forall\,t\in\mathcal{T}\,\,\text{and}\\
+&\mathbb{E}[(Y_t-\mu)(Y_{t-h}-\mu)]=\gamma_h,\,\,|\gamma_h|<\infty,\,\,\forall\,t\in\mathcal{T}\,\text{and}\, \qquad h=0,\pm 1,\pm 2, \ldots
+\end{split}
+\end{equation*}
+\end{definition}
+```
+
+. . .
+
+True or false?
+
+* $\gamma_0 = \text{Var}(Y_t)$ (True or False?)
+* $\gamma_h > \gamma_{-h}$ for $h \neq 0$. (True or False?)
+* An i.i.d process with finite variance is weakly stationary. (True of False?)
+
+## What process has a higher $\gamma_1$?
+```{python}
+# Simulate two AR(1) processes with mean zero, variance one, and different autocovariance structures
+np.random.seed(2141)
+T = 301
+# AR(1) with low rho
+rho1 = 0.001
+y1 = np.zeros(T)
+for t in range(1, T):
+    y1[t] = rho1 * y1[t-1] + np.random.normal(0, 1)
+# AR(1) with high rho
+rho2 = 0.95
+y2 = np.zeros(T)
+for t in range(1, T):
+    y2[t] = rho2 * y2[t-1] + np.sqrt(1 - rho2**2) * np.random.normal(0, 1)
+
+plt.figure(figsize=(6, 3))
+plt.plot(y1, lw = 1.3)
+plt.plot(y2, lw = 1.3)
+plt.axhline(0, color='black', linestyle='--', linewidth=1)
+plt.title('Two stationary processes with different autocovariance structures')
+plt.xlabel('Periods')
+plt.tight_layout()  
+plt.grid(alpha=0.3)
+```
+
+## Strong (or Strict) Stationarity
+```{=latex}
+\begin{definition}[Strong Stationarity]
+A stochastic process $\{Y_t\}$ is said to be \emph{strongly stationary} (ou \emph{strictly stationary}) if, and only if, the joint distribution of $(Y_1, Y_2,\ldots, Y_T)$ is invariant with respect to time shifts:
+\begin{equation*}
+F_{Y}(Y_1,Y_2,\ldots,Y_n)=F_{Y}(Y_{1+\tau},Y_{2+\tau},\ldots,Y_{n+\tau}),\,\,\forall\,\tau
+\end{equation*} 
+where $F_Y(.)$ is the joint CDF of the random vector $(Y_1, Y_2,\ldots, Y_n)$.
+\end{definition}
+```
+
+. . .
+
+True or false?
+
+* If a process is weakly stationary, it is also strongly stationary. (True or False?)
+* If a process is strongly stationary, it is also weakly stationary. (True or False?)
+* An i.i.d process with finite variance is strongly stationary. (True of False?)
+
+## Ergodicity - Motivation
+
+- Let's call the mysterious process from the YOLO simulation $m_t$;
+- Denote by $m_t^{(i)}$ as the realization of $m$ at time $t$ for the $i$-th path;
+- The paths are independent (because I chose so!);
+
+. . .
+
+- Let's say I want to estimate two (potentially different) quantities:
+    - $\mathbb{E}[m_{20}]$
+    - $\mathbb{E}[m_{80}]$;
+- How can I do that?
+
+## Ergodicity - Motivation
+```{python}
+# Plot the yolo plot again and add two vertical lines at 20 and at 80
+plt.figure(figsize=(6, 3))
+strong_blue = '#0057b8'  # Strong blue hex code
+for i in range(n-1):
+    plt.plot(paths[i], alpha=0.1, color=strong_blue, label='What could have happened' if i == 0 else "")
+plt.plot(paths[-1], color='red', linewidth=2, label='What you actually saw')
+plt.axvline(20, color='orange', linestyle='--', label='t=20')
+plt.axvline(80, color='orange', linestyle='--', label='t=80')
+plt.title('{} paths of the same stochastic process'.format(n))
+plt.xlabel('Periods')
+plt.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Ergodicity - Motivation
+```{python}
+# plot the kde density of values at 20 and 80 in the same subplot
+import seaborn as sns
+plt.figure(figsize=(6, 3))
+sns.kdeplot(paths[:, 20], color=strong_blue, label='t=20', fill=True, alpha=0.3)
+sns.kdeplot(paths[:, 80], color=strong_blue, linestyle='--', label='t=80', fill=True, alpha=0.3)
+plt.title('Kernel Density Estimator at t=20 and t=80 ;)')
+plt.xlim(-30, 30)
+plt.xlabel('Value')
+plt.ylabel('Density')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Ergodicity - Motivation
+
+**Proposal 1**: Estimate $\mathbb{E}[m_{20}]$ by averaging the values at $t=20$ across all paths;
+
+- Formally: $\hat{m}_{20} = \frac{1}{\text{number of paths (n)}} \sum_{i=1}^{n} m_{20}^{(i)}$;
+- Do the same for $t=80$;
+- Would this yield a consistent estimator?
+
+. . .
+
+- What's the main problem with this approach?
+
+. . .
+
+**Proposal 2**:
+Since I do not have access to the whole process, I will use the one path I have;
+
+- Estimate $\mathbb{E}[m_{20}]$ by averaging the values at $t=20$ across all time periods in the path;
+- Formally: $\widetilde{m}_{20} = \frac{1}{T} \sum_{t=1}^{T} m_{t}^{(1)}$;
+- Would I need stationarity for this to yield a consistent estimator?
+- Intuitively, would that be enough?
+
+## Ergodicity - Definition
+
+- Ergodicity is a property that some stochastic processes have;
+- Intuitive definition (don't quote me on this):
+
+```{=latex}
+\begin{definition}[Ergodicity - Intuitive]
+A stochastic process $\{Y_t\}$ is said to be \emph{ergodic} if its realized paths are "rich enough" with probability 1. By "rich enough", we mean that it \textbf{will not} get stuck in a subset of the state space or will get into cyclic trajectories with probability 1.
+\end{definition}
+```
+
+. . .
+
+
+Said in another way: if you observe a process for long enough $T$, you will be able to learn everything about the process;
+
+## Ergodicity vs Stationarity
+ 
+ - There are ways to test whether a process is stationary. We will get there;
+ - There is no way to test for ergodicity! You have to assume it!
+
+ . . . 
+
+ Important: 
+
+ - When a process is stationary, there are simple conditions that imply ergodicity;
+ - Under ergodicity and strict stationarity, $\widetilde{m}_{20}$ is consistent!
+ - This result is called the **Ergodic Theorem** (Theorem 14.9 on Hansen's book).
+
+. . .
+
+Also important:
+
+- Stationarity does not imply ergodicity: one example in the problem set;
+
+
+# Formal Definition - Ergodicity (Time Allowing)
+
+## Trivial Invariant Events
+
+- Let $G \subset \mathbb{R}^{\infty}$;
+- An event $A$ is $A = \{\omega \in \Omega | \tilde{Y}_t \in G\}$, where $\tilde{Y}_t = (..., Y_{t-1}, Y_t, Y_{t+1}, ...)$ is the history of the process;
+- The $l$-th time shift of $A$ is $A_l = \{\omega \in \Omega | \tilde{Y}_{t+l} \in G\}$, where $\tilde{Y}_{t+l} = (..., Y_{t-1+l}, Y_{t+l}, Y_{t+1+l}, ...)$ is the history of the process shifted by $l$ periods;
+
+. . . 
+
+- An event $A$ is called **invariant** if $A_l = A$ for all $l \in \mathbb{Z}$;
+- An event $A$ is called **trivial** is $\mathbb{P}(A) = 0$ or $\mathbb{P}(A) = 1$.
+
+. . .
+
+```{=latex}
+\begin{center}
+\alert{A process $Y_t$ is called \textit{\textbf{ergodic}} if every invariant event is trivial.}
+\end{center}
+```
+
+## Example
+
+- Consider the process $A = \{\max\limits_{t \in \mathbb{Z}} Y_t \leq 0\}$;
+- In words: the maximum value of the process is never negative;
+
+. . .
+
+- For any $l$, $A_l = \{\max\limits_{t \in \mathbb{Z}} Y_{t+l} \leq 0\}$;
+- Is this event invariant?
+
+. . .
+
+- Suppose $Y_t = Z$, where $Z \sim U[-1, 1]$, for all $t \in \mathbb{Z}$;
+- This means that the process is constant after $Z$ is drawn;
+- What's $\mathbb{P}(A)$ here?
+
+. . .
+
+- Is this process ergodic?
+
+## One useful characterizations of Ergodicity
+
+```{=latex}
+\begin{theorem}[Ergodicity - Characterization]
+A strictly stationary series $Y_t \in \mathbb{R}^{m}$ is ergodic if, and only if, for all events $A$ and $B$ 
+\begin{equation*}
+\lim \limits_{n \rightarrow \infty} \frac{1}{n} \sum_{l=1}^{n} \mathbb{P}(A_l \cap B) = \mathbb{P}(A) \cdot \mathbb{P}(B)
+\end{equation*}
+\end{theorem}
+```
+
+- Intuition: as we go back in time, on average, events become nearly independent;
+
+# Two Useful Theorems
+
+## Stationarity + Ergodicity = LLN
+- You will be interested in approximating means and seconds moments of a process;
+- Stationarity + ergodicity is the "right set of assumptions" to do that ;
+
+```{=latex}
+\begin{theorem}[Theorem 2 (page 203) in Hannan (1970)]
+If $Y_t$ is strictly stationary and ergodic with $\mathbb{E}[|Y_t|] < \infty$, then
+\begin{equation*}
+\bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{a.s.} \mathbb{E}[Y_t] \quad \text{as} \quad T \rightarrow \infty
+\end{equation*}
+
+Also, if $\mathbb{E}[Y_t^2] < \infty$, then
+\begin{equation*}
+\hat{\gamma}_h = \frac{1}{T} \sum_{t=1}^{T-h} (Y_t - \bar{Y}_T)(Y_{t+h} - \bar{Y}_T) \xrightarrow{a.s.} \gamma_h \quad \text{as} \quad T \rightarrow \infty
+\end{equation*}
+\end{theorem}
+``` 
+
+## What to do in practice?
+
+- The last theorem is not ideal: it assumes something we cannot test;
+- If we are only concerned with estimation, there is an easier way out:
+
+```{=latex}
+\begin{theorem}[Theorem 6 (page 210) in Hannan (1970)]
+If $Y_t$ is weakly stationary and $\sum_{i=1}^{\infty} |\gamma_i| < \infty$, then we have that
+\begin{gather*}
+\bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{L_2} \mathbb{E}[Y_t] \quad \text{as} \quad T \rightarrow \infty \\
+\hat{\gamma}_h = \frac{1}{T} \sum_{t=1}^{T-h} (Y_t - \bar{Y}_T)(Y_{t+h} - \bar{Y}_T) \xrightarrow{L_2} \gamma_h \quad \text{as} \quad T \rightarrow \infty
+\end{gather*} 
+\end{theorem}
+``` 
+- Recall that $L_2$-convergence is stronger than convergence in probability, but weaker than almost-sure convergence;
+
+## {.standout}
+Questions?
+
+
+## {.standout}
+The End
+
