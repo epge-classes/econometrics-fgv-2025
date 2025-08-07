@@ -1,0 +1,57 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=2cm]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\linespread{1.3}
+\parskip=12pt
+\parindent=0pt
+\usepackage{enumerate}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathpazo}
+
+\usepackage[dvipsnames]{xcolor}
+\definecolor{slateblue}{RGB}{45, 62, 80}
+\definecolor{FGVBlue}{RGB}{0, 114, 188}
+
+% Defining the question styles
+\theoremstyle{definition}
+\newtheorem{prob}{Problem}
+
+% Custom commands
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+
+% Command to start a new section with the word "Problem" and enumerate automatically
+\newcounter{problem}
+\renewcommand{\theproblem}{\arabic{problem}}
+
+\newcommand{\problem}[1]{
+	\stepcounter{problem}
+	\section*{Problem \theproblem{} -- (points: #1)}
+}
+
+\begin{document}
+	\begin{center}
+		{\LARGE{\textbf{Problem Set II}}}\\
+		\vspace{0.2cm}
+		Econometrics I - \textcolor{FGVBlue}{FGV EPGE}\\
+		Instructor: Raul Guarini Riva \\
+		TA: Taric Latif Padovani
+	\end{center}
+
+\problem{1}
+Show an example where the process is stationary but not ergodic;
+
+\problem{1}
+Problem 3.2 from Hamilton's book.
+
+
+\end{document}
