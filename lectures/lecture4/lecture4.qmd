@@ -1,5 +1,5 @@
 ---
-title: "Lecture 4: Lag Operator, Wold Decomposition, and ARMA Models"
+title: "Lecture 4: Lag Operator, MA Models, and AR Models"
 author: "Raul Riva"
 institute: "FGV EPGE"
 date: "some date"
@@ -133,14 +133,14 @@ T^{-1} = \sum_{k=0}^{\infty} (I - T)^k.
 - $\|y\|_\infty = \sup_t \mathbb{E}|y_t|$. Recall that finite variance implies that this is finite;
 - The lag operator is linear and bounded:
 $$
-|L| = \sup_{||y||_{\infty} \leq 1} ||Ly||_{\infty} = \sup_{\{y\}_{t\in \mathbb{Z}}: \sup_t \mathbb{E}|y_t| \leq 1}||Ly||_{\infty} = \sup_{\{y\}_{t\in \mathbb{Z}}: \sup_t \mathbb{E}|y_t| \leq 1}\left(\sup_t \mathbb{E}|y_{t-1}|\right) = 1
+\|L\| = \sup_{||y||_{\infty} \leq 1} ||Ly||_{\infty} = \sup_{\{y\}_{t\in \mathbb{Z}}: \sup_t \mathbb{E}|y_t| \leq 1}||Ly||_{\infty} = \sup_{\{y\}_{t\in \mathbb{Z}}: \sup_t \mathbb{E}|y_t| \leq 1}\left(\sup_t \mathbb{E}|y_{t-1}|\right) = 1
 $$
 
 ## In our example
 
 - $\phi(L) = I - aL$ is linear and bounded (why?);
 - $\|I - \phi(L)\| = \|I - I + aL\| = |a|$;
-- $\|I - \phi(L)\| \iff |a| < 1$;
+- $\|I - \phi(L)\| < 1 \iff |a| < 1$;
 
 . . .
 
@@ -161,8 +161,372 @@ In terms of notation, everything below is equivalent:
 
 Questions?
 
-# AR Models (Finally!!!)
+## A More Complicated Example
+Let's study a more complicated polynomial of order 2. Assume that:
+$$
+\phi(L) = I - a_1 L - a_2 L^2
+$$
+What conditions on parameters would imply invertibility?
 
+*Hint*: what does the Fundamental Theorem of Algebra say about a polynomial of order $p$, in general?
+
+. . .
+
+**Every polynomial of order $p$ has exactly $p$ (maybe complex!) roots**. So you can write:
+
+$$
+\phi(L) = \alpha\left(L - \lambda_1 I \right)\left(L - \lambda_2 I \right) = \left(\alpha \lambda_1 \lambda_2\right) \underbrace{\left(I - \frac{1}{\lambda_1} L\right)}_{\equiv \phi_1(L)}\underbrace{\left(I - \frac{1}{\lambda_2} L\right)}_{\equiv \phi_2(L)}
+$$
+
+for some (maybe complex) numbers $\alpha$, $\lambda_1$, and $\lambda_2$.
+
+## A More Complicated Example
+ 
+ - $\phi_1(L)$ and $\phi_2(L)$ are both invertible if and only if $|\lambda_1| > 1$ and $|\lambda_2| > 1$. Why?
+
+. . .
+
+ - Now, let's define $\psi(L) \equiv \frac{1}{\alpha \lambda_1 \lambda_2} \phi_1(L)^{-1}\phi_2(L)^{-1}$
+ - It's clear that $\psi(L) \phi(L) = I$. So, by definition, $\psi(L) = \phi(L)^{-1}$;
+
+. . .
+
+- Conclusion: $\phi(L)$ is invertible if and only if all its roots are *outside the unit circle*;
+- Just a fancy way of saying that the modulus of all roots must be strictly greater than 1;
+- This generalizes to polynomials of any order $p$;
+
+## What to do in practice?
+Given a polynomial $\phi(L) = I - a_1 L - a_2 L^2 - ... - a_pL^p$:
+
+- Focus on its "sister polynomial" $f(x) = 1 - a_1 x - a_2 x^2 - ... - a_p x^p$;
+- Find the roots of $f$ (numerically, of course);
+- Check the modulus of all roots: if they are all greater than 1, then $\phi(L)$ is invertible.
+- Coding tools like Matlab, Python, R, etc all have commands to check for invertibility.
+
+##  {.standout}
+
+Questions?
+
+# MA Models (Finally!!!)
+
+- A very important building block is the **Moving Average (MA) model**;
+- Let $\epsilon_t$ be a white noise process with zero mean and variance $\sigma^2$;
+- The MA model of order $q$ is defined as:
+$$
+y_t = \mu + \epsilon_t + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2} + \cdots + \theta_q \epsilon_{t-q} = \mu + \sum_{i=0}^{q} \theta_i \epsilon_{t-i}
+$$
+where $\mu$ is the mean of the process and $\theta_i$ are the parameters of the model ($\theta_0 \equiv 1$).
+
+- This is a tool to model dependence that will *completely die* after $q$ periods!
+
+. . .
+
+Notice we can write $y_t = \mu + \theta(L) \epsilon_t$ where $\theta(L) = 1 + \theta_1 L + \theta_2 L^2 + ... + \theta_q L^q$.
+
+## Is this process stationary?
+
+- The mean: $\mathbb{E}[y_t] = \mu + \mathbb{E}[\epsilon_t] + \sum_{i=1}^{q} \theta_i \mathbb{E}[\epsilon_{t-i}] = \mu$
+- The variance: $\text{Var}(y_t) = \text{Var}(\epsilon_t) + \sum_{i=1}^{q} \theta_i^2 \text{Var}(\epsilon_{t-i}) = \sigma^2(1 + \sum_{i=1}^{q} \theta_i^2)$
+- What about autocovariances? What should $\gamma_h \equiv \text{Cov}(y_t, y_{t-h})$ be?
+
+. . .
+
+There will be two cases. First, let $h > q$. Then $\gamma_h = 0$. Why? What's the intuition for this?
+
+. . .
+
+Now, what about $h \leq q$?
+
+## Let's do simple cases
+
+If $q=1$, then $y_t - \mu = \epsilon_t + \theta_1 \epsilon_{t-1}$. Hence:
+
+$$
+\gamma_1 = \mathbb{E}[(y_t - \mu)(y_{t-1} - \mu)] = \mathbb{E}[(\epsilon_t + \theta_1 \epsilon_{t-1})(\epsilon_{t-1} + \theta_1 \epsilon_{t-2})] = \sigma^2\theta_1
+$$
+
+. . .
+
+If $q=2$, then $y_t - \mu = \epsilon_t + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2}$. Hence:
+$$
+\gamma_1 = \mathbb{E}[(y_t - \mu)(y_{t-1} - \mu)] = \mathbb{E}[(\epsilon_t + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2})(\epsilon_{t-1} + \theta_1 \epsilon_{t-2} + \theta_2 \epsilon_{t-3})] = \sigma^2(\theta_1 + \theta_2\theta_1)
+$$
+
+**and very importantly** $\gamma_2 \neq 0$ here as well
+$$
+\gamma_2 = \mathbb{E}[(y_t - \mu)(y_{t-2} - \mu)] = \mathbb{E}[(\epsilon_t + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2})(\epsilon_{t-2} + \theta_1 \epsilon_{t-3} + \theta_2 \epsilon_{t-4})] = \sigma^2\theta_2
+$$
+
+## General case for $\gamma_h$
+
+- If $h \leq q$, then $\gamma_h = \sigma^2\left(\theta_h + \theta_{h+1}\theta_1 + \theta_{h+2}\theta_2 + \cdots + \theta_q\theta_{q-h}\right)$
+- If $h > q$, then $\gamma_h = 0$;
+
+. . .
+
+- True or false? "Any MA(q) is stationary".
+
+. . .
+
+- The case $q = \infty$ is actually well-defined. In that case we write $y_t = \mu + \sum_{i=0}^{\infty} \theta_i \epsilon_{t-i}$.
+- This is a stationary process as long as the variance of $y_t$ is finite
+- This is ensured by the following condition: $\sum_{i=0}^{\infty} \theta_i^2 < \infty$.
+- Under this condition, any MA(q) process, even with $q=\infty$, is stationary!
+- It's also common to focus on autocorrelations, which are defined as $\rho_h \equiv \frac{\gamma_h}{\gamma_0}$.
+
+## Quick Visualization ($\theta_1=-0.8, \theta_2=0.5, \theta_3=0.1, \theta_4=-0.2$)
+```{python}
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define a function that given an MA model, it will plot the autocorrelation function
+def plot_ma_acf(theta, lags=13):
+    # Compute the autocovariance function
+    acf = np.zeros(lags)
+    for h in range(lags):
+        acf[h] = sum(theta[i] * theta[i + h] for i in range(len(theta) - h))
+    acf /= acf[0]  # Normalize to get autocorrelation
+    # Plot the autocorrelation function
+    plt.figure(figsize=(5, 2.5))
+    plt.stem(range(lags), acf)
+    plt.title("Autocorrelation Function of this MA Model")
+    plt.xlabel("Lag")
+    plt.xticks(range(lags))
+    plt.ylabel("Autocorrelation")
+    plt.grid(alpha=0.2)
+    plt.show()
+
+thetas = [1, -0.8, 0.5, 0.1, -0.2]
+
+plot_ma_acf(thetas)
+
+```
+
+# AR Models
+
+- The MA-type dependence might not be suitable for all time series data;
+- Example: effects of shocks might be long-lasting and never approach zero;
+- In such cases, we can use **Autoregressive (AR) models**;
+
+. . .
+
+An AR($p$) process satisfies the following dynamics:
+$$
+y_t = \mu + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \epsilon_t
+$$
+
+. . .
+
+- In the lag operator notation:
+$$
+y_t = \mu + \sum_{i=1}^{p} \phi_i L^i y_t + \epsilon_t \implies (1 - \sum_{i=1}^{p} \phi_i L^i) y_t = \mu + \epsilon_t \implies \Phi(L) y_t = \mu + \epsilon_t
+$$
+where $\Phi(L) \equiv I - \sum_{i=1}^{p} \phi_i L^i$;
+
+## Is this process stationary?
+
+- At this point, we are already good friends with $\Phi(L)$;
+- This is the same type of polynomial we talked about!
+- What are the conditions for the invertibility of $\Phi(L)$?
+
+. . .
+
+- **The roots of $f(x) = 1 - a_1x - a_2x^2 - \cdots - a_px^p$ should lie outside the unit circle**;
+- If we can invert $\Phi(L)$, we already know that $\Phi(L)$ will have infinite terms;
+- If $\Phi^{-1}(L)$ exists, we can write:
+$$
+y_t = \Phi(L)^{-1}\mu + \Phi(L)^{-1}\epsilon_t
+$$
+
+. . .
+
+But $\Phi(L)^{-1}\mu$ is just a number. And $\Phi(L)^{-1}\epsilon_t$ is an MA($\infty$) process!
+
+. . .
+
+(You will prove in the problem set that this specific MA process is stationary!)
+
+## What are the moments?
+Consider the AR(1) process $y_t = \mu + \phi_1 y_{t-1} + \epsilon_t$ and assume $|\phi_1|<1$.
+
+- First: is this guy stationary?
+
+. . .
+
+Let's compute its mean:
+$$
+\mathbb{E}(y_t) = \mu + \phi_1 \mathbb{E}(y_{t-1}) + \mathbb{E}(\epsilon_t) = \mu + \phi_1 \mathbb{E}(y_{t-1})
+$$
+Since $\mathbb{E}(y_t) = \mathbb{E}(y_{t-1})$ (why?), we have that $\mathbb{E}(y_t) = \frac{\mu}{1-\phi_1}$.
+
+. . .
+
+Now, we analyze the variance using a similar trick:
+$$
+\text{Var}(y_t) = \text{Var}(\phi_1 y_{t-1} + \epsilon_t) = \phi_1^2 \text{Var}(y_{t-1}) + \text{Var}(\epsilon_t) = \phi_1^2 \text{Var}(y_t) + \sigma^2 \implies \text{Var}(y_t) = \frac{\sigma^2}{1-\phi_1^2}
+$$
+
+## What are the moments:
+- The first autocovariance is:
+$$
+\gamma_1 = \text{Cov}(y_t, y_{t-1}) = \text{Cov}(\mu + \phi_1 y_{t-1} + \epsilon_t, y_{t-1}) = \phi_1 \text{Var}(y_{t-1}) = \phi_1 \text{Var}(y_t)
+$$
+
+. . .
+
+- The second autocovariance is:
+$$
+\gamma_2 = \text{Cov}(y_t, y_{t-2}) = \text{Cov}(\mu + \phi_1 y_{t-1} + \epsilon_t, y_{t-2}) = \phi_1 \text{Cov}(y_{t-1}, y_{t-2}) = \phi_1 \gamma_1 = \phi_1^2 \text{Var}(y_t)
+$$
+
+. . .
+
+- A similar argument will establish that, in general, $\gamma_h = \phi \gamma_{h-1} \implies \gamma_h = \phi^h \text{Var}(y_t)$.
+
+. . .
+
+How is this different from the MA(1) case?
+
+## Quick Visualization
+```{python}
+#| fig-align: center
+#| fig-pos: top
+
+# Write python code to simulate two different AR(1) process with the same shocks but different persistence and let me plot them side by side
+np.random.seed(42)
+
+def simulate_ar1(phi, mu=0, sigma=1, n=500):
+    y = np.zeros(n)
+    epsilon = np.random.normal(0, sigma, n)
+    for t in range(1, n):
+        y[t] = mu + phi * y[t-1] + epsilon[t]
+    return y
+
+phi1 = 0.95
+phi2= 0.2
+y1 = simulate_ar1(phi1)
+y2 = simulate_ar1(phi2)
+
+plt.figure(figsize=(7, 3.3))
+plt.plot(y1, label="High persistence")
+plt.plot(y2, label="Low persistence")
+plt.grid(alpha=0.2)
+plt.title("Realizations of AR(1) Processes with the same innovations")
+plt.tight_layout()
+plt.legend()
+plt.show()
+```
+
+## Quick Visualization of Autocorrelation Functions $\rho_h \equiv \gamma_h/\gamma_0$
+```{python}
+# Compute the autocovariance function of each realized process from above and plot them side by side
+from statsmodels.tsa.stattools import acf
+
+lags = 18
+acf1 = acf(y1, nlags=lags)
+theoretical_acf1 = [phi1**abs(lag) for lag in range(lags + 1)]
+acf2 = acf(y2, nlags=lags)
+theoretical_acf2 = [phi2**abs(lag) for lag in range(lags + 1)]
+
+# plot acfs in two different subplots
+plt.figure(figsize=(7, 3.5))
+plt.subplot(1, 2, 1)
+plt.stem(range(lags + 1), acf1, label="Estimated")
+plt.scatter(range(lags + 1), theoretical_acf1, color = "C1", marker="x", label="True")
+plt.legend()
+plt.title("ACF - High Persistence")
+plt.grid(alpha=0.2)
+
+plt.subplot(1, 2, 2)
+plt.stem(range(lags + 1), acf2, label="Estimated")
+plt.scatter(range(lags + 1), theoretical_acf2, color = "C1", marker="x", label="True")
+plt.legend()
+plt.title("ACF - Low Persistence")
+plt.grid(alpha=0.2)
+
+plt.tight_layout()
+plt.show()
+```
+
+## What happens when $\phi_1 = 1$?
+
+```{python}
+n_paths = 2000
+n_sample = 150
+phi1 = 0.98
+phi2 = 1
+
+# Simulate n_paths of an AR(1) with phi1 = 0.99 and phi2 = 1
+paths = np.zeros((n_paths, n_sample, 2))
+
+# simulate the two processes with the same innovations
+for i in range(n_paths):
+    epsilon = np.random.normal(0, 1, n_sample)
+    for t in range(1, n_sample):
+        paths[i, t, 0] = phi1 * paths[i, t-1, 0] + epsilon[t]
+        paths[i, t, 1] = phi2 * paths[i, t-1, 1] + epsilon[t]
+
+# Plot the paths in two separate plots
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.plot(paths[:, :, 0].T, color='C0', alpha=0.01)
+plt.title(f"AR(1) Process with $\\phi = {phi1}$")
+plt.xlabel(r"$t$")
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.axhline(2 * np.sqrt(1/(1-phi1**2)), ls='--', color="red", label=r"$\pm 2\sigma$")
+plt.axhline(- 2 * 1/np.sqrt((1-phi1**2)), ls='--', color="red")
+plt.grid(alpha=0.2)
+plt.legend()
+ylim = [np.min(paths), np.max(paths)]
+plt.ylim(ylim)
+
+plt.subplot(1, 2, 2)
+plt.plot(paths[:, :, 1].T, color='C1', alpha=0.05)
+plt.plot(range(n_sample), 2 * np.sqrt(range(n_sample)), color = "red", ls="--", label=r"$\pm 2\sqrt{t}$")
+plt.plot(range(n_sample), -2 * np.sqrt(range(n_sample)), color = "red", ls="--")
+plt.title(f"AR(1) Process with $\\phi = {phi2}$ (Random Walk)")
+plt.xlabel(r"$t$")
+plt.grid(alpha=0.2)
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.ylim(ylim)
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+
+## The General AR(p) Case
+
+- Consider the general AR(p) process $y_t = \mu + \sum_{i=1}^{p} \phi_i y_{t-i} + \epsilon_t$;
+- Let's assume it is stationary;
+- The mean is easy, it follows the same tricks as before: $\mathbb{E}(y_t) = \frac{\mu}{1 - \phi_1 - \phi_2 ... - \phi_p}$
+
+. . . 
+
+The variance is more involved:
+```{=latex}
+\vspace{-0.7cm}
+\begin{align*}
+\gamma_0 & = Cov(y_t, y_t) \\
+& = Cov(\mu + \phi_1 y_{t-1} + ... + \phi_p y_{t-p} + \epsilon_t, y_t)\\
+& = \phi_1 \gamma_1 + \phi_2 \gamma_2 + ... + \phi_p \gamma_p + \sigma^2
+\end{align*}
+```
+
+. . .
+
+In general, recalling that $\gamma_h = \gamma_{-h}$, we will have (please verify this at home):
+$$
+\gamma_h = \phi_1 \gamma_{h-1} + \phi_2 \gamma_{h-2} + ... + \phi_p \gamma_{h-p}, \qquad h=1,2,3,...
+$$
+
+This generates a system of equations that can be solved recursively (a computer will do it).
+
+##  {.standout}
+
+Questions?
 
 ##  {.standout}
 
@@ -170,7 +534,5 @@ The End
 
 ## References
 
--   Hannan, E. J. (1970). *Multiple Time Series*. Wiley.
 -   Chapter 2 from Hamilton's book for the Lag Operator;
--   MDS sequences are covered in Chapter 7;
--   Chapter 14 from Hansen's book;
+-   Chapter 3 from Hamilton's book for the definition of AR and MA models;
