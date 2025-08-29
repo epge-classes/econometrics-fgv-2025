@@ -19,6 +19,7 @@
 \usepackage[dvipsnames]{xcolor}
 \definecolor{slateblue}{RGB}{45, 62, 80}
 \definecolor{FGVBlue}{RGB}{0, 114, 188}
+\usepackage[colorlinks=true, urlcolor=FGVBlue, linkcolor=FGVBlue, citecolor=FGVBlue]{hyperref}
 
 % Defining the question styles
 \theoremstyle{definition}
@@ -48,16 +49,96 @@
 	\end{center}
 
 \problem{1}
-Show an example where the process is stationary but not ergodic;
+In this problem, we will play with different concepts.
+
+\begin{enumerate}[a)]
+	\item Consider the following process:
+	\begin{equation*}
+		y_t = \cos(t + \theta), \forall t \in \mathbb{R}
+	\end{equation*}
+	where $\theta$ is a discrete random variable, distributed with uniform probability over the set $[0, \pi/2, \pi, 3\pi/2]$.
+
+	Show that this process is covariance stationary (or weakly stationary).
+
+	\item Show that this process is \textbf{not} strictly stationary.
+	\item Now, we consider a different process. Let $z_t$ be such that:
+	\begin{equation*}
+		z_t = \begin{cases}
+			1,\quad \forall t & \text{with probability } 0.5 \\
+			0, \quad \forall t & \text{with probability } 0.5
+		\end{cases}
+	\end{equation*}
+	Argue that this process is weakly stationary by computing its first two moments and its autocovariance function. Now, argue that the time-series mean of \textit{any} realized path will \textit{never} converge towards the mean of $z_t$.
+\end{enumerate}
+
+\problem{2}
+Consider the following AR(2) process:
+\begin{equation*}
+	(I - 1.1L + 0.18L^2)y_t = \varepsilon_t
+\end{equation*}
+where $\varepsilon_t$ is a white noise process. Is this process stationary? If so, compute its mean, its variance, and its whole autocovariance function.
 
 \problem{1}
-Problem 3.2 from Hamilton's book.
+This question is a "warm-up" exercise that will be useful for the following problem.
 
-\problem{1}
-Problem 4.5 from Hamilton's book.
+Consider the polynomial $f(x) = a_p x^p + a_{p-1} x^{p-1} + \cdots + a_1 x + a_0$, where $a_i \in \mathbb{R}$ for all $i = 0, 1, \ldots, p$ and $a_p \neq 0$. Further assume that $a_0 \neq 0$. Let $\lambda$ be any root for this polynomial.
 
-\problem{1}
-Use ARMA models to forecast inflation in Brazil. What is the best model? Produce out of sample forecasts as well.
+\begin{enumerate}[a)]
+	\item Argue that $\lambda \neq 0$;
+	\item Consider another polynomial $g(x) = a_p + a_{p-1} x + \cdots + a_1 x^{p-1} + a_0 x^p$. Show that $1/\lambda$ is a root of $g(.)$;
+	\item Argue that if $f(.)$ has all its roots outside the unit circle, then $g(.)$ has all its roots inside the unit circle.
+\end{enumerate}
+
+\problem{3}
+In this question, you will prove a claim we made in the slides. Consider a general $AR(p)$ model:
+\begin{equation*}
+y_t = \mu + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t	
+\end{equation*}
+where $\varepsilon_t$ is a white noise process. Define the operator $\Phi(L) = I - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p$. We assume that all roots of its associated polynomial $f(x) = 1 - a_1x - a_2x^2 - \cdots - a_px^p$ lie outside the unit circle. As we saw in the slides, this implies that there exists an operator $\Psi(L) = \psi_0 + \psi_1 L + \psi_2 L^2 + \cdots$ such that $\Psi(L)\Phi(L) = I$.
+
+In that case, we can write $y_t = \Psi(L)\mu + \Psi(L)\varepsilon_t$.
+
+\begin{enumerate}
+	\item Compute $\Psi(L)\mu$ explicitly as a function of $\mu$, and $(\phi_1, ..., \phi_p)$.
+	
+	\textit{Hint}: what happens when you apply $\Phi(L)$ to a constant?
+
+	\item We argued in class that the invertibility condition for $\Phi(L)$ was enough to ensure that this process is stationary because its MA($\infty$) representation is stationary. We will now work in steps to prove this claim. 
+	
+	Recall that the MA representation will be stationary if $\sum\limits_{i=0}^{\infty}\psi_i^2 < \infty$. We need to prove this result. Our approach will be directly characterizing $\psi_i$ as a function of $(\phi_1, ..., \phi_p)$.
+
+	By definition, we have that:
+	\begin{equation*}
+		(1 - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p)(\psi_0 + \psi_1 L + \psi_2 L^2 + \cdots) = 1
+	\end{equation*}
+
+	After performing these infinite multiplications, constant terms, terms that depend on $L$, terms that depend on $L^2$, terms that depend on $L^3$, and so on. Any terms that depend on powers of $L$ should be identically zero, by definition.
+
+	Show that 
+	\begin{equation}
+		\label{eq:recurrence}
+		\psi_k = \phi_1 \psi_{k-1} + \phi_2 \psi_{k-2} + ... + \phi_p \psi_{k-p}, \qquad \forall k > p.
+	\end{equation}
+
+	\item Recognize that \eqref{eq:recurrence} is a linear, homogenous, $p$-order difference equation in the $\psi$'s. Find its characteristic polynomial and explain why all its roots lie inside the unit circle.
+	
+	\item It is a classic mathematical fact that all solutions to \eqref{eq:recurrence} are linear combinations of at most $p$ terms of form $m(k)\cdot r^k$ where $m(.)$ is a polynomial in $k$ of order at most $p$, and $r$ is a root of the characteristic polynomial. If such a fact is too obscure, \href{https://wwz.unibas.ch/fileadmin/user_upload/wwz/00_Professuren/Kleiber_Oekonometrie_und_Statistik/Downloads/Topics/Skript008_DifferenceEquations.pdf}{click here}.
+	
+	Using this fact, explain why $\sum\limits_{i=0}^{\infty}\psi_i^2 < \infty$. 
+	
+	\emph{Hint}: think about the different tests for the convergence of infinite series.
+\end{enumerate}
+
+\problem{3}
+In this question, you will analyze two common price indexes for the Brazilian economy: IPCA and IGP-M. The data for this question is contained on the \texttt{ipca\_igpm.csv} file. You have access to the monthly time series of the month-over-month changes for these price indexes.
+
+\begin{enumerate}[a)]
+	\item What are the main conceptual differences between IPCA and IGP-M? What are they measuring?
+	\item Create a time-series plot with the two series.
+	\item Assume both series are stationary. Compute their mean, variance, and autocovariances up to lag 24. Which one displays the most volatility?
+	\item Plot the autocorrelation function of both series. How would you describe the differences in persistence between them?
+	\item Given your answer in item a), are the results from items b) and c) in line with your expectations? Discuss your intuition.
+\end{enumerate}
 
 
 \end{document}
