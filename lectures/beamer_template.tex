@@ -1,5 +1,5 @@
 % Customized by Raul Riva for the Econometrics course at FGV EPGE in 2025
-\documentclass[aspectratio=169, xcolor=dvipsnames, 11pt]{beamer}
+%\documentclass[aspectratio=169, xcolor=dvipsnames, 11pt]{beamer}
 \usetheme{moloch}
 \molochset{
   progressbar = frametitle,
@@ -18,6 +18,11 @@
 \setlength{\moloch@titleseparator@linewidth}{2pt}
 \setlength{\moloch@progressinheadfoot@linewidth}{1pt}
 \makeatother
+
+% Colored institute for Quarto
+\AtBeginDocument{
+  \institute{\textcolor{FGVBlue}{FGV EPGE}}
+}
 
 % Packages
 \usepackage{graphicx}
@@ -53,38 +58,38 @@
     citecolor=FGVBlue
     }
     
-% ----- Bibliography -----
-%\usepackage[backend=biber,style=authoryear]{biblatex}
-%\addbibresource{}
-% \DeclareFieldFormat{labelyear}{#1}
-% \DeclareFieldFormat{shorthand}{#1}
-% \DeclareFieldFormat{extraalpha}{#1}
-% \DeclareNameFormat{default}{\namepartfamily}
-% \AtEveryCitekey{\color{FGVBlue}}
+% % ----- Bibliography -----
+% %\usepackage[backend=biber,style=authoryear]{biblatex}
+% %\addbibresource{}
+% % \DeclareFieldFormat{labelyear}{#1}
+% % \DeclareFieldFormat{shorthand}{#1}
+% % \DeclareFieldFormat{extraalpha}{#1}
+% % \DeclareNameFormat{default}{\namepartfamily}
+% % \AtEveryCitekey{\color{FGVBlue}}
 
-%---------------- Document Start ----------------%
-\begin{document}
+% %---------------- Document Start ----------------%
+% \begin{document}
 
-%---------------- Title Slide ----------------%
-% Title page without margin changes
-\begin{frame}[plain] % Use plain to avoid navigation symbols
-  \titlepage
-\end{frame}
+% %---------------- Title Slide ----------------%
+% % Title page without margin changes
+% \begin{frame}[plain] % Use plain to avoid navigation symbols
+%   \titlepage
+% \end{frame}
 
-%---------------- Intro ----------------%
-\begin{frame}{Intro}
-  \begin{itemize}
-    \item bla bla bla
-    \item bla bla bla
-  \end{itemize}
-\end{frame}
+% %---------------- Intro ----------------%
+% \begin{frame}{Intro}
+%   \begin{itemize}
+%     \item bla bla bla
+%     \item bla bla bla
+%   \end{itemize}
+% \end{frame}
 
-\begin{frame}{Content}
+% \begin{frame}{Content}
     
-\end{frame}
+% \end{frame}
 
-\begin{frame}[standout]
-Questions?
-\end{frame}
+% \begin{frame}[standout]
+% Questions?
+% \end{frame}
 
-\end{document}
+% \end{document}
