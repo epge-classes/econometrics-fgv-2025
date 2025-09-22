@@ -1,0 +1,536 @@
+---
+title: "Lecture 5: ARMA Models and the Wold Decomposition"
+author: "Raul Riva"
+institute: "FGV EPGE"
+date: "some date"
+format: 
+    beamer:
+        aspectratio: 169
+        include-in-header: ../beamer_template.tex
+        header-includes:
+            - \apptocmd{\tightlist}{\setlength{\itemsep}{8pt}}{}{}
+        slide-level: 2
+        urlcolor: FGVBlue
+        linkcolor: slateblue
+        fig-align: center
+jupyter: python3
+highlight-style: github
+---
+
+# Intro
+
+- So far, we learned what MA and AR models are;
+- Very different ways of modelling dependence over time;
+- An ARMA model combines both ways of modelling dependence $\implies$ very flexible model;
+- Wold's Decomposition: ARMA models are _the_ class of stationary processes you should worry about!
+- We will also talk about how to _estimate_ an ARMA model;
+- We will talk about forecasting with ARMA models as well - really useful in the real world!
+
+##  {.standout}
+
+Questions?
+
+# ARMA$(p,q)$ Models
+
+- Let $\varepsilon_t$ be a white noise with variance $\sigma^2$;
+- An ARMA$(p,q)$ process $y_t$ satisfies the following dynamics:
+$$y_t = \mu + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}$$
+
+- Equivalently:
+$$\phi(L) y_t = \mu + \theta(L) \varepsilon_t$$
+where $\phi(L) = 1 - \phi_1 L - \ldots - \phi_p L^p$ and $\theta(L) = 1 + \theta_1 L + \ldots + \theta_q L^q$;
+
+. . .
+
+- What conditions will ensure that $y_t$ is stationary?
+
+## When is an ARMA$(p,q)$ stationary?
+
+- If the roots of $\phi(L)$ are outside of the unit circle, then $\phi^{-1}(L)$ is well-defined;
+- We can invert $\phi(L)$ to get:
+$$y_t = \frac{\mu}{1 - \phi_1 - \ldots - \phi_p} +  \theta(L) \varepsilon_t = \frac{\mu}{1 - \phi_1 L - \ldots - \phi_p L^p} + \psi(L) \varepsilon_t$$
+
+where $\psi(L) = \theta(L) \phi^{-1}(L)$;
+
+- The stationarity of $y_t$ depends only on the roots of $\phi(L)$, not on the roots of $\theta(L)$;
+
+. . .
+
+- From here, it is clear that: $\mathbb{E}[y_t] = \frac{\mu}{1 - \phi_1 - \ldots - \phi_p}$
+
+## What kind of autocovariance structure do we get?
+
+- Notice that if $j > q$, then: 
+$$
+\gamma_j = \phi_1 \gamma_{j-1} + \ldots + \phi_p \gamma_{j-p}
+$$
+
+- Roots of $\phi(L)$ are outside the unit circle $\implies \gamma_j \to 0$ as $j \to \infty$ (exponentially fast!);
+
+. . .
+
+- For $j \leq q$, things are way more complicated (see Section 3.3 in Brockwell and Davis);
+- The reason is that the $q$ last shocks can impose very complex dynamics without affecting stationarity!
+
+. . .
+
+What is important here:
+
+```{=latex}
+\centering
+\alert{After lag $q$ the decay should be fast and exponential. The MA part will never create trouble for stationarity.}
+```
+
+## Simulated Example: $y_t = 0.9y_{t-1} + \varepsilon_t - 0.8\varepsilon_{t-1} + 0.6\varepsilon_{t-2} + 0.4\varepsilon_{t-3} + 0.8\varepsilon_{t-4}$
+
+```{python}
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+# Set font to Arial
+plt.rcParams['font.family'] = 'Arial'
+from statsmodels.tsa.arima_process import ArmaProcess
+
+# Parameters for an ARMA(1,4) process
+ar_params = [0.9]
+ma_params = [-0.8, 0.6, 0.4, 0.8]
+n_lags = 20
+
+# Create the ARMA process
+arma_process = ArmaProcess(
+    np.r_[1, -np.array(ar_params)], 
+    np.r_[1, np.array(ma_params)]
+)
+
+# Simulate many paths from this ARMA process
+np.random.seed(42)
+n_samples = 200
+simulated_data = arma_process.generate_sample(nsample=n_samples, burnin=200)
+
+# Plot simulated data
+plt.figure(figsize=(6.5, 3))
+plt.plot(simulated_data, lw=0.5)
+plt.grid(True, alpha=0.3)
+plt.title('Simulated ARMA(1,3) Process')
+plt.show()
+```
+
+
+## Theoretical vs Estimated ACF
+
+```{python}
+from statsmodels.tsa.stattools import acf
+# Plot theoretical ACF and estimated ACF on the same plot
+theoretical_acf = arma_process.acf(lags=n_lags + 1)
+empirical_acf = acf(simulated_data, nlags=n_lags, fft=False)
+x = np.arange(1, n_lags + 1)
+
+plt.figure(figsize=(6.5, 3))
+plt.plot(x, theoretical_acf[1:], label='Theoretical ACF', color='blue', marker="o")
+plt.plot(x, empirical_acf[1:], label='Estimated ACF', color='orange', marker="x")
+plt.axvline(5, color='red', lw=0.5, ls='--')
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xlabel('Lag')
+plt.xticks(x)
+plt.tight_layout()
+plt.show()
+```
+
+## Let's repeat it with $\phi_1 = 0.4$
+
+```{python}
+# Parameters for an ARMA(1,4) process with phi_1 = 0.4
+ar_params = [0.4]
+ma_params = [-0.8, 0.6, 0.4, 0.8]
+
+# Simulate data from this new parametrization
+arma_process = ArmaProcess(
+    np.r_[1, -np.array(ar_params)], 
+    np.r_[1, np.array(ma_params)]
+)
+np.random.seed(42)
+simulated_data = arma_process.generate_sample(nsample=n_samples, burnin=200)
+
+# Compute theoretical and empirical ACF
+theoretical_acf = arma_process.acf(lags=n_lags + 1)
+empirical_acf = acf(simulated_data, nlags=n_lags, fft=False)
+x = np.arange(1, n_lags + 1)
+# Plot theoretical ACF and estimated ACF on the same plot
+plt.figure(figsize=(6.5, 3))
+plt.plot(x, theoretical_acf[1:], label='Theoretical ACF', color='blue', marker="o")
+plt.plot(x, empirical_acf[1:], label='Estimated ACF', color='orange', marker="x")
+plt.axvline(5, color='red', lw=0.5, ls='--')
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xlabel('Lag')
+plt.xticks(x)
+plt.tight_layout()
+plt.show()
+```
+
+## Example for ARMA(1,1)
+
+- Consider an ARMA(1,1) process:
+$$y_t = \mu + \phi_1 y_{t-1} + \varepsilon_t + \theta_1 \varepsilon_{t-1}, \qquad |\phi_1| < 1$$
+
+- We already know that $\gamma_2 = \phi_1 \gamma_1$;
+- More generally, $\gamma_j = \phi_1 \gamma_{j-1}$ for $j \geq 2$. We just need to find $\gamma_0$ and $\gamma_1$;
+
+. . .
+
+```{=latex}
+\begin{align*}
+\gamma_0 &= \phi_1 \gamma_1 + Cov(\varepsilon_t, y_t) + \theta_1 Cov(\varepsilon_{t-1}, y_t) = \phi_1 \gamma_1 + \sigma^2 + \theta_1 \phi_1 \sigma^2 + \theta_1^2 \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 + Cov(\varepsilon_t, y_{t-1}) + \theta_1 Cov(\varepsilon_{t-1}, y_{t-1}) = \phi_1 \gamma_0 + \theta_1 \sigma^2
+\end{align*}
+```
+
+. . .
+
+Now we can solve this linear system!
+
+## Example of ARMA(1,1)
+
+- Just solve the linear system:
+```{=latex}
+\begin{align*}
+\gamma_0 &= \frac{(1 + \theta_1^2 + 2 \theta_1 \phi_1) \sigma^2}{1 - \phi_1^2} \\
+\gamma_1 &= \left[\theta + \phi + \frac{(\theta + \phi)^2 \phi}{1 - \phi^2}\right]\sigma^2 \\
+\gamma_j &= \phi_1^{j-1} \gamma_1, \quad j \geq 2
+\end{align*}
+```
+. . .
+
+- Wait a minute... what would happen if $\theta_1 = -\phi_1$?
+
+## The Minimal Representation
+
+- In that case $y_t$ would be white noise!!!
+
+. . .
+
+- In fact, ARMA models can be _overparameterized_;
+- Remember that we can always factor the lag polynomials:
+$$\phi(L) = (1 - \phi_1 L)(1 - \phi_2 L) \ldots (1 - \phi_p L)$$
+$$\theta(L) = (1 + \theta_1 L)(1 + \theta_2 L) \ldots (1 + \theta_q L)$$ 
+
+. . .
+
+- If there are common roots that cancel out, we can have the exact same correlation structure with $p-1$ lags of $y_t$ and $q-1$ lags of $\varepsilon_t$;
+- This is a theoretical justification to prefer small values of $p$ and $q$ when estimating an ARMA model!
+- When we write "ARMA(p,q)" we implicitly mean the _minimal representation_!
+
+##  {.standout}
+
+Questions?
+
+# Forecasting with ARMA Models
+
+- ARMA models are extremely useful for forecasting;
+- They are a simple way to capture complicated dynamics;
+
+. . .
+
+- Our job: compute conditional expectations of some process $y_t$;
+- Our data: $\{y_1, y_{2}, \ldots, y_{T-1}, y_T\} \implies$ a _strip_ of _one_ realized path with $T$ observations;
+
+. . .
+
+- Exact forecasts will depend on the _infinite_ past of the process;
+- We will use the _available_ information to compute the approximate forecasts;
+
+## Forecasting with Infinite Data
+
+- Let's say you have a stationary ARMA model and has already computed the MA($\infty$) representation:
+$$y_t - \mu = \psi(L) \varepsilon_t = \sum_{i=0}^{\infty} \psi_i \varepsilon_{t-i} = \epsilon_t + \sum_{i=1}^{\infty} \psi_i \epsilon_{t-i}$$
+- As usual: $\psi(L) = \sum_{i=0}^{\infty} \psi_i L^i$, with $\psi_0 = 1$ and $\sum_{i=0}^{\infty} |\psi_i| < \infty$;
+
+. . .
+
+- Let's say you want to compute $\mathbb{E}[y_{t+s} | \varepsilon_t, \varepsilon_{t-1}, \ldots]$;
+- Just using the definition:
+$$
+y_{t+s} - \mu = \varepsilon_{t+s} + \psi_1\varepsilon_{t+s-1} +\ldots + \psi_{s-1} \varepsilon_{t+1} + \psi_s \varepsilon_{t} + \sum_{i=s+1}^{\infty} \psi_i \varepsilon_{t+s-i}
+$$
+
+. . .
+
+- This implies: $\mathbb{E}[y_{t+s} | \varepsilon_t, \varepsilon_{t-1}, \ldots] = \mu + \sum\limits_{i=s}^{\infty} \psi_i \varepsilon_{t+s-i}$
+
+## Forecasting with Infinite Data
+
+- There is a shorthand notation that is useful here. Notice that:
+$$
+\frac{\psi(L)}{L^s} = L^{-s} + \psi_1 L^{1-s)} + \psi_2 L^{2-s} + \ldots + \psi_{s-1} L^{-1} + \psi_s + \psi_{s+1} L + \psi_{s+2}L^2 \ldots
+$$
+
+- The _annihilation operator_ denoted by $[.]_+$ only considers the positive powers of $L$:
+$$
+\left[\frac{\psi(L)}{L^s}\right]_{+} \equiv \psi_s + \psi_{s+1} L + \psi_{s+2}L^2 + \ldots
+$$
+
+- Now we can write:
+$$
+\mathbb{E}[y_{t+s} | \varepsilon_t, \varepsilon_{t-1}, \ldots] = \mu + \left[\frac{\psi(L)}{L^s}\right]_{+} \varepsilon_t
+$$
+
+## Wait, this feels like cheating...
+
+- We never really observe the shocks $\varepsilon_t$. How can this be useful?
+
+. . .
+
+- Sometimes we can actually back them out from infinite data!
+- Let's go back to the ARMA$(p,q)$ representation: $\phi(L) (y_t -\mu) = \theta(L) \varepsilon_t$
+- $\phi(L) = 1 - \phi_1 L - \ldots - \phi_p L^p$ and $\theta(L) = 1 + \theta_1 L + \ldots + \theta_q L^q$;
+- If all roots of $\phi(L)$ are outside the unit circle, then $\phi^{-1}(L)$ is well-defined;
+- If all roots of $\theta(L)$ are outside the unit circle, then $\theta^{-1}(L)$ is well-defined as well!
+  
+. . .
+
+- In this case we can write:
+$$
+\theta(L)^{-1}\phi(L) (y_t -\mu) = \varepsilon_t \implies \varepsilon_t = \eta(L) (y_t - \mu)
+$$
+where $\eta(L) = \theta^{-1}(L)\phi(L) = \eta_0 + \eta_1L + \eta_2L^2 + \ldots$
+
+## The General Formula
+- So, for an ARMA$(p,q)$ process with all roots outside the unit circle:
+$$
+\mathbb{E}[y_{t+s} | y_t, y_{t-1}, \ldots] = \mu + \left[\frac{\psi(L)}{L^s}\right]_{+} \eta(L) (y_t - \mu)
+$$
+
+- In practice, a computer will do the necessary algebra to get the coefficients;
+- But it is really important to understand _why_ a computer can do that!
+- This is also called the **Wiener-Kolmogorov** prediction formula;
+- The crucial assumptions are stationarity and invertibility, i.e., roots of $\phi(L)$ and $\theta(L)$ must be outside the unit circle!
+
+## Example: AR(1)
+
+- Assume that $(1-\phi L)y_t = \varepsilon_t$ with $|\phi| < 1$;
+- Then we know that $\psi(L) = \phi(L)^{-1} = 1 + \phi L + \phi^2 L^2 + \ldots$ and $\eta(L) = \phi(L) = 1 - \phi L$;
+
+. . .
+
+- The annihilation operator gives:
+$$
+\left[\frac{\psi(L)}{L^s}\right]_{+} = \phi^s + \phi^{s+1} L + \phi^{s+2} L^2 + \ldots = \phi^s (1 + \phi L + \phi^2 L^2 + \ldots) = \phi^s \left(\frac{1}{1-\phi L}\right)
+$$
+
+. . .
+
+- So we get:
+$$
+\mathbb{E}[y_{t+s} | y_t, y_{t-1}, \ldots] = \mu + \phi^s (y_t - \mu)
+$$
+
+. . .
+
+- What happens when $s \to \infty$? What's the intuition for this result?
+- You will do the AR(p) case in the problem set!
+
+## Example: MA($q$)
+- Now let's assume that $y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}$;
+- Then $\psi(L) = \theta(L) = 1 + \theta_1 L + \ldots + \theta_q L^q$, and $\eta(L) = \theta(L)^{-1}$;
+- If $s > q$, then the annihilation operator gives 0;
+- In that case: $\mathbb{E}[y_{t+s} | y_t, y_{t-1}, \ldots] = \mu$. What's the intuition for this result?
+
+. . .
+
+- In case $s \leq q$, then:
+$$
+\left[\frac{\psi(L)}{L^s}\right]_{+} = \theta_s + \theta_{s+1} L + \ldots + \theta_q L^{q-s}
+$$
+
+- The final forecast is:
+$$
+\mathbb{E}[y_{t+s} | y_t, y_{t-1}, \ldots] = \mu + \frac{(\theta_s + \theta_{s+1} L + \ldots + \theta_q L^{q-s}) }{\theta(L)^{-1}}(y_t - \mu)
+$$
+
+##  {.standout}
+
+Questions?
+
+# Forecasting with _Finite_ Data
+
+- Bad news about what we did: we assumed we had infinite data. That is never the case...
+- There are two main ways of dealing with this problem:
+    1. Create an "approximate" forecast;
+    2. Use some method that explictly accounts for "missing data";
+
+- The most common method for (2) is something called the "Kalman Filter";
+- We don't have time to cover it, but it's super useful in Macro/Finance/estimation of DSGE models, etc!
+- Most statistical software use (2) as the method to construct forecasts;
+- But learning (1) is instructive and yields the same results is $T$ is large!
+
+## Example: ARMA(1,2)
+
+```{python}
+# | fig-align: center
+
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+# ARMA(1,2) instead of ARMA(1,1)
+phi = 0.9
+theta1 = 0.8
+theta2 = -0.3
+# keep `theta` for compatibility with the simple CSS forecast below (uses only one MA coeff)
+theta = theta1
+
+horizons = 20
+n_path_short = 50
+n_path_long = 500
+np.random.seed(42)
+
+# generate ARMA(1,2)
+y_long = ArmaProcess(
+    np.r_[1, -phi],
+    np.r_[1, theta1, theta2]
+).generate_sample(nsample=n_path_long, burnin=400)
+y_short = y_long[:n_path_short]
+
+plt.figure(figsize=(6.5, 3))
+plt.plot(y_long, label='Long Path (ARMA(1,2))', color='blue', lw=1)
+plt.plot(y_short, label='Short Path (ARMA(1,2))', color='orange', lw=1, ls='--')
+plt.axvline(n_path_short-1, color='red', lw=0.5, ls='--')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xlabel('Time')
+plt.tight_layout()
+
+# Create the SARIMAX objects for ARMA(1,2)
+model_short = SARIMAX(y_short, order=(1, 0, 2))
+model_long = SARIMAX(y_long, order=(1, 0, 2))
+
+# Estimate the parameters
+model_short_fit = model_short.fit(disp=False)
+model_long_fit = model_long.fit(disp=False)
+
+# Extract params (const, ar.L1, ma.L1, ma.L2, sigma2)
+phi_hat_short = model_short_fit.params[0]
+theta1_hat_short = model_short_fit.params[1]
+theta2_hat_short = model_short_fit.params[2]
+
+phi_hat_long = model_long_fit.params[0]
+theta1_hat_long = model_long_fit.params[1]
+theta2_hat_long = model_long_fit.params[2]
+```
+
+```{python}
+def forecast_kalman(model, params, h=horizons):
+    model_fit = model.filter(params)
+    forecast = model_fit.get_forecast(steps=h)
+    return forecast.predicted_mean
+
+def conditional_css_forecast(y, phi_hat, theta1_hat, theta2_hat, h=horizons):
+    """
+    Conditional (CSS-style) multi-step forecast for ARMA(1,2) with zero mean:
+    y_t = phi_hat * y_{t-1} + eps_t + theta1_hat * eps_{t-1} + theta2_hat * eps_{t-2}
+
+    Assumes past unobserved epsilons before the sample are zero.
+    """
+    # initialize recursion
+    y_prev = 0.0
+    eps_prev = 0.0      # eps_{t-1}
+    eps_prev2 = 0.0     # eps_{t-2}
+
+    # 1) In-sample recursion to recover last two innovations: eps_n and eps_{n-1}
+    for t in range(len(y)):
+        eps_t = y[t] - phi_hat * y_prev - theta1_hat * eps_prev - theta2_hat * eps_prev2
+        eps_prev2 = eps_prev
+        eps_prev = eps_t
+        y_prev = y[t]
+
+    # After loop:
+    # y_prev -> last observed y (y_n)
+    # eps_prev -> eps_n
+    # eps_prev2 -> eps_{n-1}
+    eps_n = eps_prev
+    eps_n_minus1 = eps_prev2
+    y_last = y_prev
+
+    # Allocate forecast array
+    yhat = np.empty(h, dtype=float)
+    # 1-step ahead
+    yhat[0] = phi_hat * y_last + theta1_hat * eps_n + theta2_hat * eps_n_minus1
+
+    if h == 1:
+        return yhat
+
+    # 2-step ahead: theta1 term drops (eps_{n+1}=0), theta2 uses eps_n
+    yhat[1] = phi_hat * yhat[0] + theta2_hat * eps_n
+
+    # 3+ steps: MA contributions vanish, pure AR propagation
+    for k in range(2, h):
+        yhat[k] = phi_hat * yhat[k - 1]
+
+    return yhat
+
+kalman_short = forecast_kalman(model_short, model_short_fit.params)
+kalman_long = forecast_kalman(model_long, model_long_fit.params)
+css_short = conditional_css_forecast(y_short, phi_hat_short, theta1_hat_short, theta2_hat_short)
+css_long = conditional_css_forecast(y_long, phi_hat_long, theta1_hat_long, theta2_hat_long)
+```
+
+## Example: ARMA(1,2) - Small vs Large Sample Forecasts
+```{python}
+# | fig-align: center
+# Plot short and long forecasts side-by-side
+kalman_short = np.asarray(kalman_short)
+css_short = np.asarray(css_short)
+kalman_long = np.asarray(kalman_long)
+css_long = np.asarray(css_long)
+
+# Create connected forecast series that start at the last observed value
+kalman_conn_short = np.r_[y_short[-1], kalman_short]
+css_conn_short = np.r_[y_short[-1], css_short]
+
+kalman_conn_long = np.r_[y_long[-1], kalman_long]
+css_conn_long = np.r_[y_long[-1], css_long]
+
+# X coordinates
+x_obs_short = np.arange(n_path_short)
+x_fc_short = np.arange(n_path_short - 1, n_path_short + horizons)
+
+x_obs_long = np.arange(n_path_long)
+x_fc_long = np.arange(n_path_long - 1, n_path_long + horizons)
+
+fig, axs = plt.subplots(1, 2, figsize=(6, 3), sharey=True)
+
+# Left: short data and forecasts (original figure)
+axs[0].plot(x_obs_short[30:], y_short[30:], label='Observed Path', color='black', lw=1)
+axs[0].plot(x_fc_short, kalman_conn_short, label='Kalman Forecast', color='blue', lw=1)
+axs[0].plot(x_fc_short, css_conn_short, label='Approximate', color='orange', lw=1, ls='--')
+axs[0].axvline(n_path_short - 1, color='red', lw=0.5, ls='--')
+axs[0].set_title('Short Data')
+axs[0].legend()
+axs[0].set_xlabel('Time')
+axs[0].grid(True, alpha=0.3)
+
+# Right: long data and forecasts
+axs[1].plot(x_obs_long[490:], y_long[490:], label='Observed Path', color='k', lw=1)
+axs[1].plot(x_fc_long, kalman_conn_long, label='Kalman Forecast', color='blue', lw=1)
+axs[1].plot(x_fc_long, css_conn_long, label='Approximate', color='orange', lw=1, ls='--')
+axs[1].axvline(n_path_long - 1, color='red', lw=0.5, ls='--')
+axs[1].set_title('Long Data')
+axs[1].legend()
+axs[1].set_xlabel('Time')
+axs[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+##  {.standout}
+
+The End
+
+## References
+
+-   Chapter 3 from Hamilton's book for and the basics of ARMA models;
+-   Chapter 4 from Hamilton's book for Forecasting and Wold's Decomposition;
+-   Chapter 5 from Hamilton's book for Estimation of ARMA models;
