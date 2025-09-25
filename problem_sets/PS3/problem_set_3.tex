@@ -48,13 +48,49 @@
 	\end{center}
 
 \problem{1}
-One problem using the companion matrix to get to the exact forecast for an AR(p).
+Consider an AR($p$) process:
+\begin{equation}
+	y_t - \mu = \phi_1 (y_{t-1} - \mu) + \phi_2 (y_{t-2} - \mu) + \cdots + \phi_p (y_{t-p} - \mu) + \varepsilon_t,
+	\label{eq:ar_p}
+\end{equation}
+where $\varepsilon_t \sim \text{i.i.d. } (0, \sigma^2)$. This questions will explore the dynamics of conditional moments of $y_{t+h}$ given $\mathcal{I}_t$, where $\mathcal{I}_t = \{y_t, y_{t-1}, \ldots\}$ represents the information set available at time $t$.
+
+\begin{enumerate}[a)]
+	\item Consider $p\times 1$ vector $Y_t = (y_t - \mu, y_{t-1} - \mu, \ldots, y_{t-p+1} - \mu)'$. Show that there exists a $p \times p$ matrix $A$ and a $p \times 1$ vector $U_t$ such that:
+	\[Y_t = A Y_{t-1} + U_t, \quad \forall t\]
+
+	Additionally, show that $\Omega \equiv \mathbb{E}[U_tU_t']$ is a $p \times p$ matrix with all elements equal to zero, except for the first element of the main diagonal, which is equal to $\sigma^2$.
+
+	\textit{Hint}: Matrix $A$ will only have 0's and 1's, except for the first row.
+
+	\item Show that $\mathbb{E}[Y_{t+h}|\mathcal{I}_t] = A^h Y_t$.
+	\item Find an expression for $\Var[Y_{t+h}|\mathcal{I}_t]$ that depends only on $A$, $\Omega$ and $h$;
+	\item Show that the eigenvalues of $A$ are the roots of the polynomial \[\Phi(z) = (-1)^{p}\left(z^p - \phi_1 z^{p-1} - \phi_2 z^{p-2} - \cdots - \phi_p\right),\] i.e., this is its characteristic polynomial;
+	
+	\textit{Hint 1}: Recall that the determinant of a triangular matrix is equal to the product of its main diagonal elements.
+	
+	\textit{Hint 2}: Recall that if we multiply a column of a matrix by a constant and add the result to another column, the determinant does not change. Try applying operations on $(A - \lambda I)$ to make it triangular -- this is a good refresher in Linear Algebra, isn't it? 
+
+	\item Even if you have not completed the previous item, argue that the eigenvalues of $A$ are all smaller than one in absolute value if the AR($p$) process is stationary;
+	\item Find the limits of $\mathbb{E}[Y_{t+h}|\mathcal{I}_t]$ and $\Var[Y_{t+h}|\mathcal{I}_t]$ as $h \to \infty$ if the process is stationary. What is the intuition for this result?
+\end{enumerate}
 
 \problem{1}
-Problem 4.5 from Hamilton's book.
+In this question, we will explore one example of a stationary process that is not an ARMA process. Let $\psi_j = \frac{1}{j^2}$ for $j \neq 0$ and $\psi_0 = 1$. Consider the process $y_t$ defined in the following way:
+\[
+y_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}, \quad \varepsilon_t \sim \text{i.i.d. } (0, \sigma^2).
+\]
 
-\problem{1}
-One question about a stationary process that cannot be represented as an ARMA model.
+\begin{enumerate}
+	\item Compute the mean and variance of $y_t$;
+	\item Compute the autocovariance function $\gamma(h) = Cov(y_t, y_{t-h})$ for $h = 1, 2, 3, \ldots$; Is this process covariance-stationary? Why?
+	\item Show that there are positive constants $c_1$ and $c_2$ such that $c_1 \leq h^2 \cdot \gamma(h) \leq c_2$. Conclude that $\gamma(h) = O(1/h^2)$;
+	\item Now, assume by contradiction that $y_t$ is an ARMA($p,q$) process for some finite $p$ and $q$. Let $\tilde{\gamma}(h)$ be the $h$-th autocovariance implied by the coefficients of this ARMA process. Show that 
+	\[
+	\lim_{h \to \infty}\frac{\gamma(h)}{|\tilde{\gamma}(h)|} = + \infty
+	\]
+	Conclue that $y_t$ can never be an ARMA($p,q$) process.
+\end{enumerate}
 
 \problem{1}
 Empirical question with ARMA estimation and lag selection. Also add an item so they can do forecasts.
