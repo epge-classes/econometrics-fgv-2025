@@ -2,7 +2,8 @@
 title: "Lecture 1: Non-Parametric Estimation"
 author: "Raul Riva"
 institute: "FGV EPGE"
-date: "some date"
+date: "2025-10-01"
+date-format: "MMMM, YYYY"
 format: 
     beamer:
         aspectratio: 169
