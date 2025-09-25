@@ -1,8 +1,9 @@
 ---
-title: "Lecture 5: ARMA Models and the Wold Decomposition"
+title: "Lecture 5: ARMA Models and the Wold's Decomposition"
 author: "Raul Riva"
 institute: "FGV EPGE"
-date: "some date"
+date: "2025-10-01"
+date-format: "MMMM, YYYY"
 format: 
     beamer:
         aspectratio: 169
@@ -22,9 +23,8 @@ highlight-style: github
 - So far, we learned what MA and AR models are;
 - Very different ways of modelling dependence over time;
 - An ARMA model combines both ways of modelling dependence $\implies$ very flexible model;
+- We will talk about forecasting with ARMA models as well -- really useful in the real world!
 - Wold's Decomposition: ARMA models are _the_ class of stationary processes you should worry about!
-- We will also talk about how to _estimate_ an ARMA model;
-- We will talk about forecasting with ARMA models as well - really useful in the real world!
 
 ##  {.standout}
 
@@ -366,6 +366,64 @@ Questions?
 - Most statistical software use (2) as the method to construct forecasts;
 - But learning (1) is instructive and yields the same results is $T$ is large!
 
+## How to approximate the forecasts
+
+- Consider an ARMA$(p,q)$ process:
+$$y_t - \mu = \phi_1(y_{t-1} - \mu) + \ldots + \phi_p(y_{t-p} - \mu) + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}$$
+- We have data $\{y_1, y_2, \ldots, y_T\}$ and we want to forecast $y_{T+h}$ for $h > 0$.
+- The main issue is that we only observe finite data and never observe $\varepsilon_t$;
+
+. . .
+
+- Main trick: use the equatio above to back out a series of "estimated" shocks $\hat{\varepsilon}_t$;
+- Assume that $\varepsilon_t = 0$ for $t \leq$ (before the sample);
+- Also assume that $y_t = \mathbb{E}[y_t] = \mu$ for $t \leq 0$ (before the sample);
+
+## How to approximate the forecasts
+
+Now we can back out the shocks recursively:
+```{=latex}
+\vspace{-0.5cm}
+\begin{align*}
+\hat{\varepsilon}_1 &= y_1 - \mu \\
+\hat{\varepsilon}_2 &= y_2 - \mu - \phi_1(y_1 - \mu) - \theta_1 \hat{\varepsilon}_1\\
+\hat{\varepsilon}_3 &= y_3 - \mu - \phi_1(y_2 - \mu) - \phi_2(y_1 - \mu) - \theta_1 \hat{\varepsilon}_2 - \theta_2 \hat{\varepsilon}_1\\
+&\vdots \\
+\hat{\varepsilon}_q &= y_q - \mu - \phi_1(y_{q-1} - \mu) - \ldots - \phi_{q-1}(y_1 - \mu) - \theta_1 \hat{\varepsilon}_{q-1} - \ldots - \theta_{q-1} \hat{\varepsilon}_1\\
+&\vdots \\
+\hat{\varepsilon}_T &= y_T - \mu - \phi_1(y_{T-1} - \mu) - \ldots - \phi_p(y_{T-p} - \mu) - \theta_1 \hat{\varepsilon}_{T-1} - \ldots - \theta_q \hat{\varepsilon}_{T-q}
+\end{align*}
+```
+
+- Essentially, we are doing $\hat{\varepsilon}_t \equiv y_t - \hat{y}_{t|t-1}$, where $y_{t|t-1}$ denotes the conditional expectation of $y_t$ given the past observations _and_ given that we set presample data to the unconditional mean.
+
+## How to approximate the forecasts
+
+- From here on, you can just iterate forward;
+- In general (see equation 4.2.25 from Hamilton's book):
+$$
+\hat{y}_{t+h|t} - \mu =
+\begin{cases}
+\begin{aligned}
+\phi_1 (y_{t+h-1|t} - \mu) + \phi_2 (y_{t+h-2|t} - \mu)  &+ \ldots + \phi_p(y_{t+h-p|t} - \mu) \\
+&\quad+ \theta_h \hat{\varepsilon}_t + \ldots + \theta_q \hat{\varepsilon}_{t+s-q}
+\end{aligned}
+&\text{if } h \leq p \\
+\phi_1 (y_{t+h-1|t} - \mu) + \phi_2 (y_{t+h-2|t} - \mu)  + \ldots + \phi_p(y_{t+h-p|t} - \mu)
+&\text{if } h > p
+\end{cases}
+$$
+
+. . .
+
+- In practice, compute $y_{t+1|t}$, then $y_{t+2|t}$, then $y_{t+3|t}$, and so on;
+
+. . .
+
+- Notice that, as $h\to \infty$ the forecast approaches $\mu$ exponentially fast;
+- What's the intuition for this result?
+- What is ensuring that the forecast will not explode exponentially fast, by the way?
+
 ## Example: ARMA(1,2)
 
 ```{python}
@@ -524,6 +582,47 @@ plt.tight_layout()
 plt.show()
 ```
 
+##  {.standout}
+
+Questions?
+
+# The Wold Decomposition
+
+- Why have we paid so much attention to ARMA models?
+
+. . . 
+
+- The Wold Decomposition Theorem is a powerful result;
+- It essentially says that any stationary process has an MA($\infty$) representation;
+
+. . .
+
+- By playing with $p$ and $q$, we can approximate _any_ stationary process **arbitrarily well**;
+- In a certain sense, ARMA models are _"dense"_ in the space of stationary processes!
+- For example: computers approximate real numbers using rationals all the time!
+
+## Formal Statement
+
+```{=latex}
+\begin{theorem}[Wold's Decomposition]
+Let $y_t$ be a zero-mean covariance-stationary process. Define $\mathcal{P}_{t-m}[y_t]$ as the linear projection of $y_t$ into $\{y_{t-m}, y_{t-m-1}, \ldots \}$. Also, let $e_t = y_t - \mathcal{P}_{t-1}[y_t]$ be the projection error. 
+
+Then, there exists a unique representation of $y_t$ as:
+\begin{equation}
+Y_t = \mu_t + \sum_{j=0}^{\infty} \psi_j e_{t-j}
+\end{equation}
+
+where $e_t$ is a white noise process, $\psi_0 = 1$, $\mu_t = \lim_{m \to \infty} \mathcal{P}_{t-m}[Y_t]$, and $\sum_{j=1}^{\infty} \psi_j^2 < \infty$.
+\end{theorem}
+```
+
+- A powerful result: linear representations are _the_ way to go for stationary processes;
+- ARMA methodology: approximate $\phi(L) = 1 + \phi_1 L + \phi_2 L^2 + \ldots$ by a _ratio_ of two polynomials;
+
+. . .
+
+- _"Any covariance-stationary process is an ARMA process"?_ True of False?
+
 
 ##  {.standout}
 
@@ -533,4 +632,3 @@ The End
 
 -   Chapter 3 from Hamilton's book for and the basics of ARMA models;
 -   Chapter 4 from Hamilton's book for Forecasting and Wold's Decomposition;
--   Chapter 5 from Hamilton's book for Estimation of ARMA models;
