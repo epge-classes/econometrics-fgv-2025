@@ -1,0 +1,495 @@
+---
+title: "Lecture 6: Estimation of ARMA Models"
+author: "Raul Riva"
+institute: "FGV EPGE"
+date: "2025-10-01"
+date-format: "MMMM, YYYY"
+format: 
+    beamer:
+        latex-engine: lualatex
+        aspectratio: 169
+        include-in-header: ../beamer_template.tex
+        header-includes:
+            - \apptocmd{\tightlist}{\setlength{\itemsep}{8pt}}{}{}
+            - \usepackage{unicode-math}
+            - \usepackage{tikz}
+            - \usetikzlibrary{arrows.meta,positioning}
+        slide-level: 2
+        urlcolor: FGVBlue
+        linkcolor: slateblue
+        fig-align: center
+jupyter: python3
+highlight-style: github
+---
+
+# Intro
+
+- So far, we took parameters as given when working with ARMA models;
+- In practice, we need to _estimate_ these parameters from data;
+- There many ways to estimate ARMA models: maximum likelihood, method of moments, Kalman filter, etc;
+- We will focus on MLE estimation;
+- Usually, good software for ARMA estimation gives you several options;
+- More than mastering math tricks and details, it is important to understand the _big picture_;
+
+## A Preview
+
+- It is always the MA part that will complicate things;
+- A natural estimator for AR($p$) models is just the OLS estimator: regress $y_t$ on $y_{t-1}, \ldots, y_{t-p}$;
+- Mild conditions will guarantee consistency, asymptotic normality, bla, blah, blah...
+- But for ARMA($p,q$) models, we cannot do that! We do not observe $\varepsilon_t$!!!
+
+. . .
+
+- MLE will require a _distributional assumption_ for $\varepsilon_t$;
+- We will relax that later when we touch on "_quasi-MLE_";
+- We will start with _given_ values of $p$ and $q$ and discuss model choice later;
+
+## Preliminaries
+
+- Assume that $\varepsilon_t \sim \text{i.i.d. } N(0,\sigma^2)$;
+- This will imply that $y_t$ is a Gaussian random variable. Why?
+
+. . .
+
+- We will denote by $\symbf{\Theta}$ the vector of parameters to be estimated;
+- First step: characterize the joint distribution of the sample $\symbf{y} = (y_1, \ldots, y_T)'$;
+- Denote this distribution by $f_{y_T, y_{T-1}, \ldots, y_1}(\symbf{y}; \symbf{\Theta})$;
+
+. . .
+
+- Recall: $f_{Y|X}(y, x) = f_{Y,X}(y, x) / f_X(x) \implies f_{Y,X}(y,x) = f_{Y|X}(y,x) f_X(x)$
+
+. . .
+
+- For any integer $k \geq 1$:
+```{=latex}
+\[
+\boxed{%
+f_{y_T, y_{T-1}, \ldots, y_1}(\symbf{y}; \symbf{\Theta})
+= f_{y_k, \ldots, y_1}(y_k, \ldots, y_1; \symbf{\Theta})
+\cdot \prod_{t=k+1}^T f_{y_t \mid y_{t-1}, \ldots, y_1}\bigl(y_t \mid y_{t-1}, \ldots, y_1; \symbf{\Theta}\bigr)
+}%
+\]
+```
+
+##  {.standout}
+
+Questions?
+
+# The AR($p$) Case
+- Consider the AR($p$) model below and let $\symbf{\Theta} = (c, \phi_1, \ldots, \phi_p, \sigma^2)$:
+$$
+  y_t = c + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p} + \varepsilon_t, \quad \varepsilon_t \sim \text{i.i.d. } N(0,\sigma^2)
+$$
+
+- Notice that $y_t | y_{t-1}, ..., y_{t-p} \sim N(c + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p}, \sigma^2)$. Therefore:
+$$
+f_{y_t | y_{t-1}, \ldots, y_1}(y_t | y_{t-1}, \ldots, y_1; \symbf{\Theta}) = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(y_t - c - \phi_1 y_{t-1} - \ldots - \phi_p y_{t-p})^2}{2\sigma^2}}
+$$
+
+. . .
+
+- The likelihood of the first $p$ observations, $f_{y_p, \ldots, y_1}(y_p, \ldots, y_1; \symbf{\Theta})$, is more involved;
+- Notice that the $p \times 1$ vector $\symbf{y}_{1:p} = (y_1, \ldots, y_p)'$ is multivariate normal;
+$$
+\symbf{y}_{1:p} \sim N(\symbf{\mu}, \symbf{\Omega}), \quad \symbf{\mu} = \frac{c}{1 - \sum_{i=1}^p \phi_i} \symbf{1}, \quad \symbf{\Omega}_{ij} = \gamma(|i-j|) \quad \forall i,j \in \{1,\ldots,p\}
+$$
+
+## The AR($p$) Case
+- The likelihood of the first $p$ observations is given by:
+$$
+f_{y_p, \ldots, y_1}(y_p, \ldots, y_1; \symbf{\Theta}) = (2\pi)^{-p/2}|\symbf{\Omega}^{-1}|^{1/2} e^{-\frac{1}{2} (\symbf{y}_{1:p} - \symbf{\mu})' \symbf{\Omega}^{-1} (\symbf{y}_{1:p} - \symbf{\mu})}
+$$
+
+. . .
+
+- From here, we can write the full likelihood function:
+```{=latex}
+\vspace{-0.5cm}
+\begin{align*}
+f_{y_T, \ldots, y_1}(\symbf{y}; \symbf{\Theta}) &= f_{y_k, \ldots, y_1}(y_k, \ldots, y_1; \symbf{\Theta}) \cdot \prod_{t=k+1}^T f_{y_t \mid y_{t-1}, \ldots, y_1}\bigl(y_t \mid y_{t-1}, \ldots, y_1; \symbf{\Theta}\bigr)\\
+&= (2\pi)^{-p/2}|\symbf{\Omega}^{-1}|^{1/2} e^{-\frac{1}{2} (\symbf{y}_{1:p} - \symbf{\mu})' \symbf{\Omega}^{-1} (\symbf{y}_{1:p} - \symbf{\mu})} \cdot \prod_{t=p+1}^T \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(y_t - c - \sum_{i=1}^p \phi_i y_{t-i})^2}{2\sigma^2}}\\
+&= (2\pi)^{-T/2} \sigma^{-(T-p)} |\symbf{\Omega}^{-1}|^{1/2} e^{-\frac{1}{2} (\symbf{y}_{1:p} - \symbf{\mu})' \symbf{\Omega}^{-1} (\symbf{y}_{1:p} - \symbf{\mu})} \cdot e^{-\frac{1}{2\sigma^2} \sum\limits_{t=p+1}^T (y_t - c - \sum\limits_{i=1}^p \phi_i y_{t-i})^2}
+\end{align*}
+```
+
+## The Log-Likelihood Function
+- We always optimize the log-likelihood function $\mathcal{L}(\symbf{\Theta}|\symbf{y}) = \log{\left(f_{y_T, \ldots, y_1}(\symbf{y}; \symbf{\Theta})\right)}$
+```{=latex}
+\vspace{-0.5cm}
+\begin{align*}
+\mathcal{L}(\symbf{\Theta}|\symbf{y}) &= \log{\left(f_{y_T, \ldots, y_1}(\symbf{y}; \symbf{\Theta})\right)}\\
+&= -\frac{T}{2} \log{(2\pi)} \\[0.3em]
+&\qquad -(T-p) \log{(\sigma)} + \frac{1}{2} \log{(|\symbf{\Omega}^{-1}|)} \\[0.3em]
+&\qquad {\color{red}{- \frac{1}{2} (\symbf{y}_{1:p} - \symbf{\mu})' \symbf{\Omega}^{-1} (\symbf{y}_{1:p} - \symbf{\mu})}} - {\color{blue}{\frac{1}{2\sigma^2} \sum_{t=p+1}^T (y_t - c - \sum_{i=1}^p \phi_i y_{t-i})^2}}
+\end{align*}
+```
+
+- The blue part looks like the OLS objective function;
+- The red part is "distorting" this objective function;
+
+## The Log-Likelihood Function
+- Full ML estimation requires optimizing this function w.r.t. $\symbf{\Theta}$;
+- Notice that this requires inverting a $p \times p$ matrix any time we evaluate the function;
+
+```{=latex}
+\centering
+\begin{tikzpicture}[
+    >=Latex,
+    node distance=1.2cm,
+    box/.style={
+        draw=metropolisOrange,
+        fill=metropolisOrange!10,
+        rounded corners,
+        minimum width=3.6cm,
+        minimum height=1.4cm,
+        align=center
+    },
+    arrow/.style={
+        ->,
+        line width=0.8pt,
+        draw=metropolisOrange
+    }
+]
+    % Nodes
+    \node[box] (inputs) {Data $\{y_t\}_{t=1}^T$ \\ Parameters $\symbf{\Theta}$};
+    \node[box, right=of inputs] (loglik) {Compute $\mathcal{L}(\symbf{\Theta}\,|\,y_{1:T})$};
+    \node[box, right=of loglik] (opt) {Numerical optimization};
+
+    % Arrows
+    \draw[arrow] (inputs) -- (loglik);
+    \draw[arrow] (loglik) -- (opt);
+\end{tikzpicture}
+```
+
+. . .
+
+- Wait a minute... what if $T >> p$?
+- In that case the main contribution to the log-likelihood function comes from the blue part;
+  
+. . .
+
+- This suggests a simpler approach: _conditional_ MLE;
+- Assume that the first $p$ observations are fixed (non-random);
+- Approximate $\mathcal{L}(\symbf{\Theta}|\symbf{y}_{1:T})$ by $\log{\left(f_{y_{p+1}, \ldots, y_T | y_{1:p}}(\symbf{y}; \symbf{\Theta})\right)}$
+
+## The Numerical Shortcut for the AR($p$) Case
+- Recall that, up to a constant, we have:
+$$
+\log{\left(f_{y_{p+1}, \ldots, y_T | y_{1:p}}(\symbf{y}; \symbf{\Theta})\right)} = - \sum_{t=p+1}^T \frac{(y_t - c - \sum_{i=1}^p \phi_i y_{t-i})^2}{2\sigma^2} - (T-p) \log{(\sigma)}
+$$
+
+. . .
+
+```{=latex}
+\begin{itemize}
+\item Estimators for $c$ and $\phi_i$'s are the same as the OLS from regressing $y_t$ on $y_{t-1}, \ldots, y_{t-p}$;
+\item Super simple closed-form solutions! \emoji{smiling-face-with-sunglasses}
+\item The estimator for $\sigma^2$ is just the (biased) sample variance of the OLS residuals;
+\pause
+\item If $T$ is large, this is a very good approximation to the full MLE;
+\item $\mathcal{L}(\symbf{\Theta}|\symbf{y})$ is efficiently computed using the Kalman filter -- darker magic for the next year!
+\end{itemize}
+```
+
+##  {.standout}
+
+Questions?
+
+## The MA($q$) Case
+- Consider the MA($q$) model below and let $\symbf{\Theta} = (\mu, \theta_1, \ldots, \theta_q, \sigma^2)$:
+$$
+  y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}, \quad \varepsilon_t \sim \text{i.i.d. } N(0,\sigma^2)
+$$
+- There is no hope to get an "OLS"-type trick... we do not see the shocks...
+- There are again two main approaches: full MLE and conditional MLE;
+- We will focus on the conditional MLE approach;
+- You can see the full MLE approach in Hamilton's book (Chapter 5);
+- If $T$ is large, the two approaches will give very similar results;
+- Similar to the forecasting exercise in the last lecture!
+
+## The MA($q$) Case
+- The key observation is that $y_t|\varepsilon_{t-1}, \ldots, \varepsilon_{t-q} \sim N(\mu + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}, \sigma^2)$;
+- But how is that useful if we do not observe $\varepsilon_t$?
+
+. . .
+
+- Let's assume that $\varepsilon_{-q+1} = \varepsilon_{-q+2} = \ldots = \varepsilon_{0} = \mathbb{E}[\varepsilon_t] = 0$;
+- We can start a recursion, like in the forecasting case:
+```{=latex}
+\vspace{-0.5cm}
+\begin{align*}
+\varepsilon_{1} &= y_{1} - \mu\\
+\varepsilon_{2} &= y_{2} - \mu - \theta_1 \varepsilon_{1}\\
+\varepsilon_{3} &= y_{3} - \mu - \theta_1 \varepsilon_{2} - \theta_2 \varepsilon_{1}\\
+&\vdots\\
+\varepsilon_{t} &= y_{t} - \mu - \theta_1 \varepsilon_{t-1} - \ldots - \theta_q \varepsilon_{t-q} \\
+&\vdots\\
+\varepsilon_{T} &= y_{T} - \mu - \theta_1 \varepsilon_{T-1} - \ldots - \theta_q \varepsilon_{T-q}
+\end{align*}
+```
+
+## The Conditional Log-Likelihood Function
+- From here, we can write the conditional log-likelihood function:
+```{=latex}
+\vspace{-0.5cm}
+\begin{align*}
+\log{\left(f_{y_t, \ldots, y_1 | \varepsilon_{-q+1} = \varepsilon_{-q+2} = \ldots = \varepsilon_{0} = 0}(\symbf{y}; \symbf{\Theta})\right)} &= \sum_{t=q+1}^T \log{\left(f_{y_t | \varepsilon_{t-1}, \ldots, \varepsilon_{t-q}}(y_t | \varepsilon_{t-1}, \ldots, \varepsilon_{t-q}; \symbf{\Theta})\right)}\\
+&= - \sum_{t=1}^T \frac{(\varepsilon_t)^2}{2\sigma^2} - (T-q) \log{(\sigma)}
+\end{align*}
+```
+
+- When there is an MA component, the logical flow is:
+```{=latex}
+\centering
+\begin{tikzpicture}[
+    >=Latex,
+    node distance=1.2cm,
+    box/.style={
+        draw=metropolisOrange,
+        fill=metropolisOrange!10,
+        rounded corners,
+        minimum width=2.0cm,
+        minimum height=1.4cm,
+        align=center
+    },
+    arrow/.style={
+        ->,
+        line width=0.8pt,
+        draw=metropolisOrange
+    }
+]
+    % Nodes
+    \node[box] (inputs) {Data $\{y_t\}_{t=1}^T$ \\ Parameters $\symbf{\Theta}$};
+    \node[box, right=of inputs] (back_out) {Back out $\{\varepsilon_t\}_{t=1}^T$};
+    \node[box, right=of back_out] (loglik) {Compute conditional\\ log-likelihood};
+    \node[box, right=of loglik] (opt) {Numerical \\ optimization};
+
+    % Arrows
+    \draw[arrow] (inputs) -- (back_out);
+    \draw[arrow] (back_out) -- (loglik);
+    \draw[arrow] (loglik) -- (opt);
+\end{tikzpicture}
+```
+
+##  {.standout}
+
+Questions?
+
+# The ARMA($p,q$) Case
+- Consider a Guassian ARMA($p,q$) model and let $\symbf{\Theta} = (c, \phi_1, \ldots, \phi_p, \theta_1, \ldots, \theta_q, \sigma^2)$:
+$$
+  y_t = c + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}, \quad \varepsilon_t \sim \text{i.i.d. } N(0,\sigma^2)
+$$
+- We can combine the two previous approaches;
+- Given $\symbf{\Theta}$, we will back out $\varepsilon_t$ recursively;
+- We also note that $y_t|y_{t-1}, \ldots, y_1, \varepsilon_{t-1}, \ldots, \varepsilon_{t-q} \sim N(c + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p}, \sigma^2)$
+- Then we are ready to use the conditioning trick once again!
+
+## The Recursion
+- As we did with the AR($p$), assume $y_1, \ldots, y_p$ are fixed;
+- Assume that $\varepsilon_p = \varepsilon_{p-1} = \ldots = \varepsilon_{p-q+1} = 0$
+- The first shock to be backed out is $\varepsilon_{p+1} = y_{p+1} - c - \sum_{i=1}^p \phi_i y_{p+1-i}$
+- Then we get $\varepsilon_{p+2} = y_{p+2} - c - \sum_{i=1}^p \phi_i y_{p+2-i} - \theta_1 \varepsilon_{p+1}$
+- And so on...
+- You might be skeptical of "assuming values" for the shock... but usually $p$ and $q$ are small compared to $T$!
+- You will almost never see $q > 10$ and $p > 20$ in practice!
+
+## The Conditional Log-Likelihood Function
+- The conditional log-likelihood function, up to a constant, is given by:
+```{=latex}
+\vspace{-0.5cm}
+\begin{equation*}
+\mathcal{L}(\symbf{\Theta}|\symbf{y}) = \log{\left(f_{y_t, \ldots, y_1 | \varepsilon_{-q+1} = \varepsilon_{-q+2} = \ldots = \varepsilon_{0} = 0}(\symbf{y}; \symbf{\Theta})\right)} 
+= - \sum_{t=p+1}^T \frac{(\varepsilon_t)^2}{2\sigma^2} - (T-p) \log{(\sigma)}
+\end{equation*}
+``` 
+- The logical flow is the same as in the MA($q$) case;
+
+. . . 
+
+**Regarding numerical optimization**:
+
+- Do we have guarantees the numerical method will converge to the global maximum? No.
+- Is it much harder as we increase $p$ and $q$? Yes and no: increasing $p$ is fine, but $q$ is hell;
+- Where to start the optimization? OLS estimates for $\phi$ are a good shot;
+- What about $\theta$? Start with zeros or small values;
+- Try several different starting points and make sure you get similar answers;
+
+# Inference
+
+- Ok great, we can estimate ARMA($p,q$) models;
+- How to do inference?
+
+. . .
+
+- We will use standard MLE results;
+- Important assumptions: a correctly specified model and $\symbf{\Theta_0}$ must be an interior point;
+- Recall that, if the model is correctly specified, then:
+$$
+\sqrt{T}\left(\hat{\symbf{\Theta}} - \symbf{\Theta}_0\right) \xrightarrow{d} N(0, \mathcal{I}^{-1}(\symbf{\Theta}_0))
+$$ 
+where $\mathcal{I}(\symbf{\Theta})$ is the Fisher information matrix;
+
+- Recall that, in this case, $\mathcal{I}(\symbf{\Theta}) = -\mathbb{E}\left[\frac{\partial^2 \mathcal{L}(\symbf{\Theta}|\symbf{y})}{\partial \symbf{\Theta} \partial \symbf{\Theta}'}\right] = \mathbb{E}\left[\frac{\partial \mathcal{L}(\symbf{\Theta}|\symbf{y})}{\partial \symbf{\Theta}}\frac{\partial \mathcal{L}(\symbf{\Theta}|\symbf{y})}{\partial \symbf{\Theta}'}\right]$;
+
+## Feasible Inference
+- Of course we do not know $\mathcal{I}(\symbf{\Theta}_0) \implies$ it needs to be estimated!
+
+. . .
+
+- Theory suggests two equally valid ways of estimating it. Let us define two objects:
+1. The Hessian:
+$$
+\mathcal{H}(\hat{\symbf{\Theta}}) \equiv \frac{1}{T-p}\cdot \frac{\partial^2 \mathcal{L}(\hat{\symbf{\Theta}}|\symbf{y})}{\partial \symbf{\Theta} \partial \symbf{\Theta}'} = \frac{1}{T-p} \cdot \sum\limits_{t=p+1}^{T}\frac{\partial^2\log\left(f_{y_t|\symbf{y_{t-1}}}(y_t|\symbf{y}_{t-1}; \hat{\symbf{\Theta}})\right)}{\partial \symbf{\Theta} \partial \symbf{\Theta}'}
+$$
+
+. . .
+
+2. The score function and its associated _outer product_:
+$$
+\mathcal{S}(\hat{\symbf{\Theta}})_t \equiv \frac{\partial \log\left(f_{y_t|\symbf{y_{t-1}}}(y_t|\symbf{y}_{t-1}; \hat{\symbf{\Theta}})\right)}{\partial \symbf{\Theta}}; \qquad \mathcal{O}(\hat{\symbf{\Theta}}) \equiv \frac{1}{T - p}\cdot \sum\limits_{t=p+1}^T\mathcal{S}(\hat{\symbf{\Theta}})_t \mathcal{S}(\hat{\symbf{\Theta}})_t'
+$$
+
+. . .
+
+- Then, we can estimate $\mathcal{I}(\symbf{\Theta}_0)$ by either $\left[-\mathcal{H}(\hat{\symbf{\Theta}})\right]$ or $\left[\mathcal{O}(\hat{\symbf{\Theta}})\right]$;
+
+. . .
+
+- (Adjust the starting point of the sum as needed, it doesn't matter asymptotically);
+
+## Quasi-MLE
+- What if $\varepsilon_t$ is not Gaussian?
+- The MLE is still consistent under some conditions (e.g. finite fourth moment);
+- The idea, and the term _Quasi-MLE_, is due to White (Econometrica, 1982);
+
+. . .
+
+- The asymptotic distribution is now:
+$$
+\sqrt{T}\left(\hat{\symbf{\Theta}} - \symbf{\Theta}_0\right) \xrightarrow{d} N\left(0, \underbrace{\mathcal{H}^{-1}(\symbf{\Theta}_0) \mathcal{I}(\symbf{\Theta}_0) \mathcal{H}^{-1}(\symbf{\Theta}_0)'}_{\text{the "sandwich" variance}}\right)
+$$
+
+- The "bread" uses the Hessian and the "meat" uses the outer product of the score;
+- The estimator for the sandwich is $\left[-\mathcal{H}^{-1}(\hat{\symbf{\Theta}})\mathcal{O}(\hat{\symbf{\Theta}})\mathcal{H}^{-1}(\hat{\symbf{\Theta}})'\right]$
+
+
+# Some Simulations
+
+##  {.standout}
+
+Questions?
+
+# How to choose $p$ and $q$?
+
+## The Model Selection Problem
+
+- So far, we have assumed that $p$ and $q$ are known;
+- In practice, we need to choose them from the data;
+- Naive approach: maximize the log-likelihood over all possible $(p,q)$ pairs;
+
+. . .
+
+- But this will **always** favor larger models! Why?
+  - Adding parameters can never decrease the maximized log-likelihood;
+  - Converges to a perfect fit *in_sample* as $(p,q) \to \infty$ (overfitting);
+
+. . .
+
+- We need a formal criterion that **penalizes model complexity**;
+- This leads to _information criteria_: balance fit vs. parsimony;
+
+## Information Criteria: General Framework
+
+- The general form of information criteria is:
+$$
+\boxed{\text{IC} = -2 \cdot \mathcal{L}(\hat{\symbf{\Theta}}|\symbf{y}) + \text{penalty}(k, T)}
+$$
+where $k$ is the number of parameters and $T$ is the sample size;
+
+. . .
+
+- The first term measures **goodness-of-fit** (we want it small);
+- The second term **penalizes complexity** (increases with $k$);
+- We choose the model that **minimizes** the IC;
+
+. . .
+
+- Different penalties lead to different criteria;
+- The key trade-off: smaller penalty $\implies$ more likely to select larger models;
+
+## The Main Information Criteria
+
+Let $k = p + q + 2$ be the number of parameters in an ARMA($p,q$) model (including $c$ and $\sigma^2$).
+
+. . .
+
+**Akaike Information Criterion (AIC)**:
+$$
+\boxed{\text{AIC} = -2 \cdot \mathcal{L}(\hat{\symbf{\Theta}}|\symbf{y}) + 2k}
+$$
+
+- It will find that minimizes the expected KL divergence to the true model;
+- It might deliver an over-parametrized model (remember the minimal representation?);
+
+. . .
+
+**Bayesian Information Criterion (BIC)** or **Schwarz Criterion (SIC)**:
+$$
+\boxed{\text{BIC} = -2 \cdot \mathcal{L}(\hat{\symbf{\Theta}}|\symbf{y}) + k \log(T)}
+$$
+
+- It approximates the model with the highest posterior probability (assuming equal priors);
+- It is **consistent**: selects the true model (if it is in the candidate set) with probability $\to 1$ as $T \to \infty$;
+
+## Comparing the Penalties
+
+- Notice that for $T > 8$, we have $\log(T) > 2$, so BIC penalizes more heavily than AIC;
+
+```{=latex}
+\begin{center}
+\begin{tabular}{lcc}
+\hline
+\textbf{Sample Size} & \textbf{AIC penalty} & \textbf{BIC penalty} \\
+\hline
+$T = 50$ & $2k$ & $3.91k$ \\
+$T = 100$ & $2k$ & $4.61k$ \\
+$T = 500$ & $2k$ & $6.21k$ \\
+$T = 1000$ & $2k$ & $6.91k$ \\
+\hline
+\end{tabular}
+\end{center}
+```
+
+. . .
+
+- As $T \to \infty$: BIC penalty grows much faster than AIC;
+- Implication: BIC tends to select **more parsimonious models** than AIC;
+
+## How to Use Information Criteria in Practice
+
+**Step-by-step procedure**:
+
+1. Choose a maximum order $p_{\max}$ and $q_{\max}$ (often based on theory or exploratory analysis);
+2. Estimate all ARMA($p,q$) models for $p \in \{0, 1, \ldots, p_{\max}\}$ and $q \in \{0, 1, \ldots, q_{\max}\}$;
+3. Compute your chosen IC for each model;
+4. Select the model with the **minimum** IC value;
+
+. . .
+
+**Important notes**:
+
+- All models must be estimated on the **same sample** (same $T$);
+- Start with reasonable $p_{\max}$ and $q_{\max}$ (e.g., 5-10 for quarterly data, 12-24 for monthly);
+- If the selected model is at the boundary, consider increasing the maximum orders;
+
+
+##  {.standout}
+
+The End
+
+## References
+
+-   Chapter 5 from Hamilton's book for ARMA estimation;
+-   Chapter 28 from Hansen's book on model selection for MLE;
