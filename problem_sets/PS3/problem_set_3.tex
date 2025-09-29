@@ -109,7 +109,7 @@ where $\varepsilon_t \sim \text{i.i.d. } N(0, \sigma^2)$. We will assume that th
 
 \begin{enumerate}[a)]
 	\item Create a plot showing the time series evolution of the IPCA series;
-	\item For given values of $p$ and $q$ (and the associated parameters), write a function that returns the conditional log-likelihood function of an ARMA($p,q$) model. You can assume Gaussian errors with constant variance $\sigma^2$;
+	\item For given values of $p$ and $q$ (and the associated parameters), write a function that returns the conditional log-likelihood function of an ARMA($p,q$) model.
 	\item Consider $p,q \in \{0,1,2\}$. For each of the 8 possible combinations of $p$ and $q$ (4 proper ARMA models, 2 AR models, and 2 MA models), estimate parameters by conditional maximum likelihood. Create a table in which you report, for each model, the estimated parameters, 95\% confidence intervals, and the AIC and BIC values;
 	\item Based on the AIC and BIC values, which model would you choose? Why? Do they disagree in terms of the best model? If the model chosen by BIC is different than the one chosen by AIC, pick your favorite and justify your choice.
 	\item For the model with the best possible fit, create two plots: (i) the fitted values against the actual series; (ii) the residuals of the model against time. Comment on these plots. 
