@@ -19,7 +19,13 @@
 \usepackage[dvipsnames]{xcolor}
 \definecolor{slateblue}{RGB}{45, 62, 80}
 \definecolor{FGVBlue}{RGB}{0, 114, 188}
-
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=FGVBlue,
+	urlcolor=FGVBlue,
+	citecolor=FGVBlue,
+}
 % Defining the question styles
 \theoremstyle{definition}
 \newtheorem{prob}{Problem}
@@ -47,7 +53,7 @@
 		TA: Taric Latif Padovani
 	\end{center}
 
-\problem{1}
+\problem{2}
 Consider an AR($p$) process:
 \begin{equation}
 	y_t - \mu = \phi_1 (y_{t-1} - \mu) + \phi_2 (y_{t-2} - \mu) + \cdots + \phi_p (y_{t-p} - \mu) + \varepsilon_t,
@@ -75,7 +81,7 @@ where $\varepsilon_t \sim \text{i.i.d. } (0, \sigma^2)$. This questions will exp
 	\item Find the limits of $\mathbb{E}[Y_{t+h}|\mathcal{I}_t]$ and $\Var[Y_{t+h}|\mathcal{I}_t]$ as $h \to \infty$ if the process is stationary. What is the intuition for this result?
 \end{enumerate}
 
-\problem{1}
+\problem{2}
 In this question, we will explore one example of a stationary process that is not an ARMA process. Let $\psi_j = \frac{1}{j^2}$ for $j \neq 0$ and $\psi_0 = 1$. Consider the process $y_t$ defined in the following way:
 \[
 y_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}, \quad \varepsilon_t \sim \text{i.i.d. } (0, \sigma^2).
@@ -92,9 +98,25 @@ y_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}, \quad \varepsilon_t \sim \te
 	Conclue that $y_t$ can never be an ARMA($p,q$) process.
 \end{enumerate}
 
-\problem{1}
-Empirical question with ARMA estimation and lag selection. Also add an item so they can do forecasts.
+\problem{6}
+On the last problem set, you analyzed Brazilian inflation data. Now, you we will create a full pipeline for the estimation of an ARMA model for inflation and we will use it for forecasting. Please use the same dataset \texttt{ipca\_igpm.csv} as last time. We will concentrate on the IPCA time series for this problem set. We will model it as an ARMA($p,q$) process with unknown $p$ and $q$:
 
-\problem{1}
-Empirical question 
+\begin{equation}
+	y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q}
+	\label{eq:arma_pq}
+\end{equation}
+where $\varepsilon_t \sim \text{i.i.d. } N(0, \sigma^2)$. We will assume that the process is stationary and invertible, so that the parameters are identified.
+
+\begin{enumerate}[a)]
+	\item Create a plot showing the time series evolution of the IPCA series;
+	\item For given values of $p$ and $q$ (and the associated parameters), write a function that returns the conditional log-likelihood function of an ARMA($p,q$) model. You can assume Gaussian errors with constant variance $\sigma^2$;
+	\item Consider $p,q \in \{0,1,2\}$. For each of the 8 possible combinations of $p$ and $q$ (4 proper ARMA models, 2 AR models, and 2 MA models), estimate parameters by conditional maximum likelihood. Create a table in which you report, for each model, the estimated parameters, 95\% confidence intervals, and the AIC and BIC values;
+	\item Based on the AIC and BIC values, which model would you choose? Why? Do they disagree in terms of the best model? If the model chosen by BIC is different than the one chosen by AIC, pick your favorite and justify your choice.
+	\item For the model with the best possible fit, create two plots: (i) the fitted values against the actual series; (ii) the residuals of the model against time. Comment on these plots. 
+	\item Create a plot showing the autocorrelation function of residuals. Comment on this plot;
+	\item Now we will do some forecasting. For the model with the best fit, simulate 24 realizations of a random variable distributed as $N(0, \hat{\sigma}^2)$. Given the estimated parameters and these simulated shocks, iterate $y_t$ forward following \eqref{eq:arma_pq} to get a path of simulated future realizations of $y_t$. Plot the original series followed by your forecast.
+	\item Repeat the item above 1000 times and keep track of the forecasts. For each point in time, compute the realizations in the $5\%$ and $95\%$ percentiles of the forecasts. Plot your forecast with these bounds around it.
+	\item Intuitively, how similar is this process to the non-parametric boostrap we saw in the beginning of the class?
+\end{enumerate}
+
 \end{document}
