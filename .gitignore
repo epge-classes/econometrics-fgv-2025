@@ -9,6 +9,8 @@ lecture*_files/
 Question_Bank.md
 Question_Bank.tex
 *.html
+check.*
+check_gpt.py
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
