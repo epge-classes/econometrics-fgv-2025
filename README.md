@@ -8,13 +8,13 @@ This is the repository for the first half of Econometrics I, taught by [Raul Riv
 ## Why Should You Take This Class?
 First of all, it's a mandatory class. But let's set that aside...
 
-Most of you will be doing empirical work very soon. This class will cover topics that are useful for applied work in several fields like Labor Economics, Development Economics, Urban Economics, Finance, Health Economics, etc. After learning the basics in a cross-sectional environment, we will tap into other data structures like *Time Series* and *Panel Data*. Both are ubiquitous in applied work nowadays. Mastering the topics in this class will help you hit the ground running with empirical work in the next quarters.
+Most of you will be doing empirical work very soon. This class will cover topics that are useful for applied work in several fields like Labor Economics, Development Economics, Urban Economics, Macroeconomics, Finance, Health Economics, etc. After learning the basics in a cross-sectional environment, we will tap into other data structures like *Time Series* and *Panel Data*. Both are ubiquitous in applied work nowadays. Mastering the topics in this class will help you hit the ground running with empirical work in the next quarters.
 
 I have four broad learning goals for this first half of the class. Ideally, after Week 5, you will be able to:
 
 - Understand the motivation and implementation of standard non-parametric kernel-based methods;
 - Understand the main idea behind bootstrap methods for i.i.d. data and their implementation;
-- Deal with time series data, understand concepts like persistence and autocorrelation, estimate ARMA models, and estimate a VAR, etc.;
+- Deal with time series data, understand concepts like persistence and autocorrelation, estimate ARMA models, create forecasts, etc.;
 - Implement GMM estimation under a general heteroskedasticity and autocorrelation structure (very useful for panel methods!);
 
 ## Topics
@@ -25,10 +25,10 @@ A very tentative schedule below:
 | Week | Tentative Schedule                |
 |------|--------------------------------------------|
 |Week 1    | Non-parametric estimation + (i.i.d.) Bootstrap|
-|Week 2    |Intro to time dependence + ARMA models|
-|Week 3    |Estimation of ARMA models + LGN and CLTs for dependent data|
-|Week 4    |The basics of VARs and IRFs|
-|Week 5    |GMM and HAC estimation|
+|Week 2    |Intro to time dependence + AR and MA Models|
+|Week 3    |ARMA Models - covariance structure, estimation, and forecasting|
+|Week 4    |LLN and CLTs for time-dependent data + HAC covariance estimation|
+|Week 5    |GMM computation + asymptotic theory|
 
 ## Books? Slides?
 
@@ -53,12 +53,12 @@ It is good etiquette to email the TA beforehand and let him know about your spec
 
 There is good and bad news here:
  - **Good news**: attendance is not mandatory at all. In any case, I like to believe I will be able to add value to your learning experience. Hence, I suggest you come. But there will be absolutely no retaliation if you choose not to -- I mean it.
- - **Bad news**: if you decide to come, you _have_ to be on time. There is a 10-minute grace period. I reserve the right to deny your entry after that, unless you have an extremely good reason to be late, or let me know in advance that you will be late.
+ - **Bad news**: if you decide to come, you _have_ to be on time. There is a 10-minute grace period. I reserve the right to deny your entry after that, unless you have an extremely good reason to be late, or you let me know in advance that you will be late.
 
 ## Evaluation
 
- - There will be **two problem sets** and **one exam** for this first half of the class;
- - These three pieces of evaluation will be graded out of 10. Your grade for the first half of the class will be a weighted average of these three grades out of 10: 1/6 * (grade on problem set 1) + 1/6 * (grade on problem set 2) + 2/3 * (grade on the exam);
+ - There will be **three problem sets** and **one exam** for this first half of the class;
+ - These four pieces of evaluation will be graded out of 10. Your grade for the first half of the class will be a weighted average of these three grades out of 10. One third of your grade will come from problem sets, and two thirds will come from the exam;
  - The exam will be in-person and individual. I will make sure you have enough time for the exam. I do not want you to be time-constrained;
  - Every student is allowed to bring *one A4-sized sheet with notes, on both sides*. You cannot share notes during the exam, but you can bring anything written on your sheet.
 
@@ -67,7 +67,7 @@ There is good and bad news here:
 - You should form groups of _up to_ 3 people. You should keep the same group throughout the first half of the class. Andrea will let divorce and remarriage happen in the second half.
 - You should create a folder for your group under ```student_work```. The name of your directory should be ```name1_name2_name3```. For instance, if your group is composed of Alice, Bob, and Charlie, you should create a folder called ```alice_bob_charlie```. Each of these folders should contain subdirectories for the different problem sets. For instance, ```alice_bob_charlie/ps1```, ```alice_bob_charlie/ps2```, ...
 - The problem sets will have both theoretical questions and empirical questions. You need to submit _a PDF report_ answering both the theoretical part and the coding part. You do not need to include any code in this report.
-- You can use any reasonable language to solve the empirical parts, as long as it does not come with pre-made routines. For example: Python, R, Matlab, Julia, even C or Fortran if you are a very hardcore person. No, you cannot use Stata and you cannot use pre-packaged routines. For example, if you are solving something with the GMM estimator, I do not want you using the ```gmm``` package in R. Just be reasonable.
+- You can use any reasonable language to solve the empirical parts, as long as it does not come with pre-made routines. For example: Python, R, Matlab, Julia, even C or Fortran if you are a very hardcore person. No, you cannot use Stata and you cannot use pre-packaged routines, unless it is something super standard such as numerical optimization. For example, if you are solving something with the GMM estimator, I do not want you using the ```gmm``` package in R. Just be reasonable.
 - Submit code and your PDF reports as separate files. Add as many figures and tables to your report as you deem necessary to answer the empirical part.
 
 ## Ongoing Feedback
