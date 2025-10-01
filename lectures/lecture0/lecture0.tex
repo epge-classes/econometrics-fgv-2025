@@ -30,7 +30,7 @@
 \title[]{Lecture 0: Class Setup}
 \author{\textbf{Raul Riva}}
 \institute{\scriptsize \textcolor{FGVBlue}{FGV EPGE}}
-\date{Date Placeholder}
+\date{October, 2025}
 
 % ----- Custom commands -----
 \newtheorem{prop}[theorem]{Proposition}
@@ -76,6 +76,7 @@
     \item \textbf{Instructor}: Raul Guarini Riva — \texttt{raul.riva@fgv.br};
     \item \textbf{Teaching Assistant}: Taric Latif — \texttt{tariclatif@gmail.com};
     \item \textbf{Class Schedule}: Tuesdays and Thursdays, 11:00–13:00;
+    \item \textbf{Office Hours}: Fridays, 9:00-10:00;
     \item \textbf{TA Session Schedule}: check with Taric;
     \item GitHub repository: \url{https://github.com/rgriva/econometrics-fgv-2025}
     \item After class, you should review the online syllabus in detail;
@@ -111,8 +112,8 @@
     \item Analyze time series data:
       \begin{itemize}
         \item Concepts: stationarity, ergodicity, persistence, autocorrelation, ...
-        \item Basics of ARMA models and VARs;
-        \item Impulse response functions;
+        \item Estimation and forecasting with ARMA models;
+        \item Asymptotic distribution of the OLS estimator under autocorrelation;
       \end{itemize}
     \item Implement GMM estimation under heteroskedasticity and autocorrelation;
     \begin{itemize}
@@ -125,10 +126,11 @@
 \begin{frame}{Books? Slides?}
   \begin{itemize}\itemsep1em
     \item I will provide slides for the lectures;
-    \item These slides will be mostly based on two books:
+    \item These slides will be mostly based on two books + a famous reference here and there:
       \begin{itemize}
         \item \textbf{Econometrics}, by Bruce Hansen (hello, old friend!);
-        \item \textbf{Time Series Analysis}, by James Hamilton (serious dark magic);
+        \item \textbf{Time Series Analysis}, by James Hamilton (very comprehensive, also very long);
+        \item \textbf{Stochastic Limit Theory}, by James Davidson (seriously dark magic)
       \end{itemize}
     \item I will highlight the recommended readings in the slides, and reading the books is \textbf{mandatory}.
     \item Slides are not a substitute for reading the books;
@@ -148,21 +150,21 @@
     \item \textbf{Week 3:} 
     \begin{itemize}
       \item Estimation of ARMA models, MLE estimators...
-      \item LLN's and CLT's for dependent data -- focus on using the results rather than proving every single little thing;
+      \item LLN's and CLT's for dependent data -- focus on using the results;
     \end{itemize}
     \item \textbf{Week 4:} 
     \begin{itemize}
-      \item VAR's, companion form, reduced-form vs structural VARs;
-      \item Impulse response functions and local projections;
+      \item LLN and CLT's for dependent data -- focus on using the results rather than proving every single little thing;
+      \item Intro to GMM;
     \end{itemize}
-    \item \textbf{Week 5:} GMM
+    \item \textbf{Week 5:}
     \begin{itemize}
-      \item GMM definition and asymptotic theory;
+      \item GMM asymptotic theory;
       \item GMM and HAC estimation + numerical pitfalls;
   \end{itemize}
   \end{itemize}
   \vspace{1em}
-  \textit{Note: Schedule is still under construction.}
+  \textit{Note: subject to change.}
 \end{frame}
 
 \begin{frame}{Evaluation and Grades}
