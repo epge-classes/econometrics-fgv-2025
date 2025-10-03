@@ -109,12 +109,12 @@ R_n = n(X_{(n)} - \theta),
 
 \begin{enumerate}[a)]
 	\item Show that $R_n \leq 0$.
-    \item Let $J_n(x, P) = P(Rn \leq x)$ be the cdf of the root $R_n$ above. Show that $J_n(x, P)$ converges in distribution to $J(x, P) = P(-\theta X \leq x)$, where $X \sim \text{exp}(1)$, i.e.,
+    \item Let $J_n(x, P) = P(R_n \leq x)$ be the cdf of the root $R_n$ above. Show that $J_n(x, P)$ converges in distribution to $J(x, P) = P(-\theta X \leq x)$, where $X \sim \text{exp}(1)$, i.e.,
     \[
     J(x, P) =
     \begin{cases}
     e^{x/\theta}, & x \leq 0 \\
-    0 & \text{otherwise}
+    1 & \text{otherwise}
     \end{cases}
     \]
 	Hint: for every $r \in \mathbb{R}$, remember that $\left(1 + \frac{r}{n}\right)^{n} \xrightarrow{n \to \infty} e^r$.
@@ -123,7 +123,7 @@ R_n = n(X_{(n)} - \theta),
 	
 	For each $n$, let $\left\{X_{i, n}\right\}_{i=1}^{n}$ be an i.i.d. sample from $P_n$. Denote by $X_{(n), n}$ the maximum of this $n$-th sample. Also, denote by $\theta(P_n)$ the maximum of the support of $P_n$.
 	
-	Now, show that $\lim\limits_{n\rightarrow \infty}P\left(n (X_{(n), n}) - \theta(P_n) \leq - \epsilon\right) \leq e^{-1}, \forall \epsilon >0$.
+	Now, show that $\lim\limits_{n\rightarrow \infty}P\left(n (X_{(n), n} - \theta(P_n)) \leq - \epsilon\right) \leq e^{-1}, \forall \epsilon >0$.
 
 	\item Use this result to show that $J_n(x, P_n)$, which is the distribution of the bootstrapped root under the measure $P_n$ does $not$ converge to $J(x, P)$.
 	
