@@ -11,6 +11,7 @@ Question_Bank.tex
 *.html
 check.*
 check_gpt.py
+*.ipynb
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
