@@ -63,10 +63,14 @@ There is good and bad news here:
  - Every student is allowed to bring *one A4-sized sheet with notes, on both sides*. You cannot share notes during the exam, but you can bring anything written on your sheet.
 
 ## Problem Set Logistics
+Aside from learning the material, we will use problem sets to get you up to speed with GitHub. It is a very useful tool for collaboration, version control, and sharing code. You will use it a lot in your academic and professional life. If you haven't created an account yet, please do so [here](https://github.com/join).
 
+**Important stuff**:
+
+- All problem sets are posted under [```problem_sets```](problem_sets). The necessary data files and instructions are also there.
 - You should form groups of _up to_ 3 people. You should keep the same group throughout the first half of the class. Andrea will let divorce and remarriage happen in the second half.
-- You should create a folder for your group under ```student_work```. The name of your directory should be ```name1_name2_name3```. For instance, if your group is composed of Alice, Bob, and Charlie, you should create a folder called ```alice_bob_charlie```. Each of these folders should contain subdirectories for the different problem sets. For instance, ```alice_bob_charlie/ps1```, ```alice_bob_charlie/ps2```, ...
-- The problem sets will have both theoretical questions and empirical questions. You need to submit _a PDF report_ answering both the theoretical part and the coding part. You do not need to include any code in this report.
+- We will use **GitHub Classroom** to handle the problem sets. For each problem set, there is a link for the associated assignment through GitHub Classroom. Check the instructions stored under the [```problem_sets```](problem_sets) folder.
+- These problem sets will have both theoretical questions and empirical questions. You need to submit _a PDF report_ answering both the theoretical part and the coding part. You do not need to include any code in this report.
 - You can use any reasonable language to solve the empirical parts, as long as it does not come with pre-made routines. For example: Python, R, Matlab, Julia, even C or Fortran if you are a very hardcore person. No, you cannot use Stata and you cannot use pre-packaged routines, unless it is something super standard such as numerical optimization. For example, if you are solving something with the GMM estimator, I do not want you using the ```gmm``` package in R. Just be reasonable.
 - Submit code and your PDF reports as separate files. Add as many figures and tables to your report as you deem necessary to answer the empirical part.
 
