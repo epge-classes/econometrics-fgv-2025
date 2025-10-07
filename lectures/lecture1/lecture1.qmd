@@ -330,7 +330,7 @@ $$
 \sqrt{nh}\left(\hat{\Delta}_1(x) - h^2 \kappa_2 f(x) B(x)\right) \xrightarrow{p} 0
 $$
 
-as long as $nh^5 = 1$ (why do we need this?);
+as long as $nh^5 = O(1)$ (why do we need this?);
 
 ## Asymptotic Theory - Main Result
 Please see all the technical conditions on Hansen's book (Chapter 19);
