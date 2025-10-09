@@ -11,7 +11,7 @@ Notice that this one is to set everything up.
 
 ## 📝 Problem Set 1
 - Link: **[https://classroom.github.com/a/G16f7moK](https://classroom.github.com/a/G16f7moK)**
-- Due date: TBD
+- Due date: Thursday, October 16th
 
 ## 📝 Problem Set 2
 - Link: [To be added]
