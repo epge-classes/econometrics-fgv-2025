@@ -114,8 +114,8 @@ First, we define what a _random variable_ is:
 
 ## Stochastic Processes
 ```{=latex}
-\begin{definition}[Stochastic Process]
-A \textit{stochastic process} is an ordered sequence (collection) of random variables $\{Y_t(\omega),\omega\in\Omega,t\in\mathcal{T}\}$, such that for all $t\in\mathcal{T}$, $Y_t(\omega)$ \textbf{is a random variable} in $\Omega$ and $\mathcal{T}$ is an ordering set, for example, $\mathbb{Z} = \{-2, -1, 0, 1, 2, ...\}$.
+\begin{definition}[Stochastic Process -- a bit informal]
+A \textit{stochastic process} is an ordered sequence (collection) of random variables $\{Y_t(\omega),\omega\in\Omega,t\in\mathcal{T}\}$, such that for all $t\in\mathcal{T}$, $Y_t(\omega)$ \textbf{is a random variable} and $\mathcal{T}$ is an ordering set, for example, $\mathbb{Z} = \{-2, -1, 0, 1, 2, ...\}$.
 \end{definition}
 ```
 
@@ -384,7 +384,7 @@ Also important:
 ## Example
 
 - Consider the process $A = \{\max\limits_{t \in \mathbb{Z}} Y_t \leq 0\}$;
-- In words: the maximum value of the process is never negative;
+- In words: the maximum value of the process is not positive;
 
 . . .
 
