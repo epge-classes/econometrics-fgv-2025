@@ -123,7 +123,7 @@ A second-order kernel function $K(u)$ satisfies:
 ![Examples of Kernels](Kernels_List.png){width=50%}
 
 ## A More General Estimator
-For a given bandhwith $h>0$, the **Nadaraya-Watson (NW)** estimator is given by
+For a given bandwidth $h>0$, the **Nadaraya-Watson (NW)** estimator is given by
 $$
 \hat{m}(x) = \frac{\sum_{i=1}^n K\left(\frac{X_i - x}{h}\right) \cdot Y_i}{\sum_{i=1}^n K\left(\frac{X_i - x}{h}\right)}
 $$
