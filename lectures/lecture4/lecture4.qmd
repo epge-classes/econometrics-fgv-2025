@@ -102,10 +102,10 @@ It will be very useful to study the invertibility the polynomials $\phi(L)$:
 - Let's explore this intuition a bit more;
 - Consider $\psi_n(L) = 1 + aL + a^2L^2+ ... + a_n L^n$. Then:
 $$
-\psi_n(L) \phi(L) = (1 + aL + a^2L^2+ ... + a_n L^n)(1 - aL) = 1 - a^{n+1} L^{n+1}
+\psi_n(L) \phi(L) = (1 + aL + a^2L^2+ ... + a^n L^n)(1 - aL) = 1 - a^{n+1} L^{n+1}
 $$
 
-Hence, $\psi_n(L) \phi(L) (y_t) = y_t - a^{n+1} L^{n+1}(y_t) = y_t - a^n y_{t-n}$ for any sequence $\{y_t\}_{t \in \mathbb{Z}}$.
+Hence, $\psi_n(L) \phi(L) (y_t) = y_t - a^{n+1} L^{n+1}(y_t) = y_t - a^{n+1} y_{t-n-1}$ for any sequence $\{y_t\}_{t \in \mathbb{Z}}$.
 
 . . .
 
@@ -333,7 +333,7 @@ where $\Phi(L) \equiv I - \sum_{i=1}^{p} \phi_i L^i$;
 
 . . .
 
-- **The roots of $f(x) = 1 - a_1x - a_2x^2 - \cdots - a_px^p$ should lie outside the unit circle**;
+- **The roots of $f(x) = 1 - \phi_1x - \phi_2x^2 - \cdots - \phi_px^p$ should lie outside the unit circle**;
 - If we can invert $\Phi(L)$, we already know that $\Phi(L)$ will have infinite terms;
 - If $\Phi^{-1}(L)$ exists, we can write:
 $$
