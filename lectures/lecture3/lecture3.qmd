@@ -115,7 +115,7 @@ First, we define what a _random variable_ is:
 ## Stochastic Processes
 ```{=latex}
 \begin{definition}[Stochastic Process -- a bit informal]
-A \textit{stochastic process} is an ordered sequence (collection) of random variables $\{Y_t(\omega),\omega\in\Omega,t\in\mathcal{T}\}$, such that for all $t\in\mathcal{T}$, $Y_t(\omega)$ \textbf{is a random variable} and $\mathcal{T}$ is an ordering set, for example, $\mathbb{Z} = \{-2, -1, 0, 1, 2, ...\}$.
+A stochastic process is a ordered family of random variables $\{Y_t , t \in \mathcal{T}\}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, where $\mathcal{T}$ is an ordered set. One realization of this process is denoted by $\{Y_t(\omega), \omega \in \Omega\}$.
 \end{definition}
 ```
 
@@ -124,7 +124,7 @@ Loosely speaking:
 - A **random variable** is way to model an uncertain number;
 - A **stochastic process** is a way to model an uncertain _path_;
 - In reality, we only observe one, and only one, realization of the stochastic process;
-- Think about the history of the world: it is a single realization of $\Omega$;
+- Think about the history of the world: it is a single realization from $\Omega$;
 - YOLO: you only live once!
 
 ## YOLO
