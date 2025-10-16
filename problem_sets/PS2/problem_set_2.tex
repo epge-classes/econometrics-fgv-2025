@@ -94,7 +94,7 @@ In this question, you will prove a claim we made in the slides. Consider a gener
 \begin{equation*}
 y_t = \mu + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t	
 \end{equation*}
-where $\varepsilon_t$ is a white noise process. Define the operator $\Phi(L) = I - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p$. We assume that all roots of its associated polynomial $f(x) = 1 - a_1x - a_2x^2 - \cdots - a_px^p$ lie outside the unit circle. As we saw in the slides, this implies that there exists an operator $\Psi(L) = \psi_0 + \psi_1 L + \psi_2 L^2 + \cdots$ such that $\Psi(L)\Phi(L) = I$.
+where $\varepsilon_t$ is a white noise process. Define the operator $\Phi(L) = I - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p$. We assume that all roots of its associated polynomial $f(x) = 1 - \phi_1x - \phi_2x^2 - \cdots - \phi_px^p$ lie outside the unit circle. As we saw in the slides, this implies that there exists an operator $\Psi(L) = \psi_0 + \psi_1 L + \psi_2 L^2 + \cdots$ such that $\Psi(L)\Phi(L) = I$.
 
 In that case, we can write $y_t = \Psi(L)\mu + \Psi(L)\varepsilon_t$.
 
