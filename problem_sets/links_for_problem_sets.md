@@ -14,7 +14,8 @@ Notice that this one is to set everything up.
 - Due date: Thursday, October 16th
 
 ## 📝 Problem Set 2
-- Link: [To be added]
+- Link: **[https://classroom.github.com/a/nMdvixsu](https://classroom.github.com/a/nMdvixsu)**
+- Due date: Thursday, October 23rd
 
 ## 📝 Problem Set 3
 - Link: [To be added]
